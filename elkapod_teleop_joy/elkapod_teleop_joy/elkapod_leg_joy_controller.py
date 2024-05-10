@@ -6,6 +6,7 @@ from elkapod_msgs.msg import LegPositions
 from enum import Enum
 from copy import deepcopy
 
+
 class Mode(Enum):
     FREE = 0
     ACCURATE = 1
