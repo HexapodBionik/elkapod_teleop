@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'hexapod_controller.ui'
+## Form generated from reading UI file 'elkapod_controller.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.2
 ##
@@ -24,7 +24,7 @@ class Ui_HexapodController(object):
     def setupUi(self, HexapodController):
         if not HexapodController.objectName():
             HexapodController.setObjectName(u"HexapodController")
-        HexapodController.resize(554, 637)
+        HexapodController.resize(564, 637)
         self.central_widget = QWidget(HexapodController)
         self.central_widget.setObjectName(u"central_widget")
         self.verticalLayout_2 = QVBoxLayout(self.central_widget)
@@ -62,7 +62,16 @@ class Ui_HexapodController(object):
 
         self.horizontalLayout_2.addWidget(self.leg_spacing_view)
 
-        self.leg_spacing_slider = QSlider(self.leg_spacing_widget)
+        self.widget_17 = QWidget(self.leg_spacing_widget)
+        self.widget_17.setObjectName(u"widget_17")
+        self.verticalLayout_12 = QVBoxLayout(self.widget_17)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_6 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_12.addItem(self.verticalSpacer_6)
+
+        self.leg_spacing_slider = QSlider(self.widget_17)
         self.leg_spacing_slider.setObjectName(u"leg_spacing_slider")
         self.leg_spacing_slider.setEnabled(True)
         self.leg_spacing_slider.setMouseTracking(True)
@@ -71,7 +80,45 @@ class Ui_HexapodController(object):
         self.leg_spacing_slider.setValue(120)
         self.leg_spacing_slider.setOrientation(Qt.Horizontal)
 
-        self.horizontalLayout_2.addWidget(self.leg_spacing_slider)
+        self.verticalLayout_12.addWidget(self.leg_spacing_slider)
+
+        self.widget_18 = QWidget(self.widget_17)
+        self.widget_18.setObjectName(u"widget_18")
+        self.horizontalLayout_10 = QHBoxLayout(self.widget_18)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.label_14 = QLabel(self.widget_18)
+        self.label_14.setObjectName(u"label_14")
+
+        self.horizontalLayout_10.addWidget(self.label_14)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_4)
+
+        self.label_15 = QLabel(self.widget_18)
+        self.label_15.setObjectName(u"label_15")
+
+        self.horizontalLayout_10.addWidget(self.label_15)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
+
+        self.label_13 = QLabel(self.widget_18)
+        self.label_13.setObjectName(u"label_13")
+
+        self.horizontalLayout_10.addWidget(self.label_13)
+
+
+        self.verticalLayout_12.addWidget(self.widget_18)
+
+        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_12.addItem(self.verticalSpacer_7)
+
+
+        self.horizontalLayout_2.addWidget(self.widget_17)
 
 
         self.verticalLayout_9.addWidget(self.leg_spacing_widget)
@@ -89,13 +136,60 @@ class Ui_HexapodController(object):
 
         self.horizontalLayout.addWidget(self.height_view)
 
-        self.height_slider = QSlider(self.height_widget)
+        self.widget_19 = QWidget(self.height_widget)
+        self.widget_19.setObjectName(u"widget_19")
+        self.verticalLayout_13 = QVBoxLayout(self.widget_19)
+        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalLayout_13.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_9 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_13.addItem(self.verticalSpacer_9)
+
+        self.height_slider = QSlider(self.widget_19)
         self.height_slider.setObjectName(u"height_slider")
         self.height_slider.setMaximum(230)
         self.height_slider.setValue(100)
         self.height_slider.setOrientation(Qt.Horizontal)
 
-        self.horizontalLayout.addWidget(self.height_slider)
+        self.verticalLayout_13.addWidget(self.height_slider)
+
+        self.widget_20 = QWidget(self.widget_19)
+        self.widget_20.setObjectName(u"widget_20")
+        self.horizontalLayout_11 = QHBoxLayout(self.widget_20)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.label_18 = QLabel(self.widget_20)
+        self.label_18.setObjectName(u"label_18")
+
+        self.horizontalLayout_11.addWidget(self.label_18)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_6)
+
+        self.label_17 = QLabel(self.widget_20)
+        self.label_17.setObjectName(u"label_17")
+
+        self.horizontalLayout_11.addWidget(self.label_17)
+
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_7)
+
+        self.label_16 = QLabel(self.widget_20)
+        self.label_16.setObjectName(u"label_16")
+
+        self.horizontalLayout_11.addWidget(self.label_16)
+
+
+        self.verticalLayout_13.addWidget(self.widget_20)
+
+        self.verticalSpacer_8 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_13.addItem(self.verticalSpacer_8)
+
+
+        self.horizontalLayout.addWidget(self.widget_19)
 
 
         self.verticalLayout_9.addWidget(self.height_widget)
@@ -150,6 +244,7 @@ class Ui_HexapodController(object):
         self.vdir_dial.setMinimumSize(QSize(80, 80))
         self.vdir_dial.setMaximumSize(QSize(80, 16777215))
         self.vdir_dial.setMaximum(360)
+        self.vdir_dial.setSingleStep(3)
         self.vdir_dial.setValue(180)
         self.vdir_dial.setWrapping(True)
         self.vdir_dial.setNotchesVisible(True)
@@ -179,12 +274,53 @@ class Ui_HexapodController(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_2)
 
-        self.vval_slider = QSlider(self.widget_2)
+        self.widget_15 = QWidget(self.widget_2)
+        self.widget_15.setObjectName(u"widget_15")
+        self.verticalLayout_11 = QVBoxLayout(self.widget_15)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.vval_slider = QSlider(self.widget_15)
         self.vval_slider.setObjectName(u"vval_slider")
         self.vval_slider.setMaximum(100)
         self.vval_slider.setOrientation(Qt.Horizontal)
+        self.vval_slider.setTickPosition(QSlider.NoTicks)
+        self.vval_slider.setTickInterval(0)
 
-        self.verticalLayout.addWidget(self.vval_slider)
+        self.verticalLayout_11.addWidget(self.vval_slider)
+
+        self.widget_16 = QWidget(self.widget_15)
+        self.widget_16.setObjectName(u"widget_16")
+        self.horizontalLayout_9 = QHBoxLayout(self.widget_16)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.label_12 = QLabel(self.widget_16)
+        self.label_12.setObjectName(u"label_12")
+
+        self.horizontalLayout_9.addWidget(self.label_12)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
+
+        self.label_11 = QLabel(self.widget_16)
+        self.label_11.setObjectName(u"label_11")
+
+        self.horizontalLayout_9.addWidget(self.label_11)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_2)
+
+        self.label_10 = QLabel(self.widget_16)
+        self.label_10.setObjectName(u"label_10")
+
+        self.horizontalLayout_9.addWidget(self.label_10)
+
+
+        self.verticalLayout_11.addWidget(self.widget_16)
+
+
+        self.verticalLayout.addWidget(self.widget_15)
 
         self.verticalSpacer_3 = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -241,6 +377,7 @@ class Ui_HexapodController(object):
         self.yaw_dial.setMaximumSize(QSize(80, 80))
         self.yaw_dial.setMinimum(-120)
         self.yaw_dial.setMaximum(120)
+        self.yaw_dial.setSingleStep(2)
         self.yaw_dial.setNotchesVisible(True)
 
         self.verticalLayout_5.addWidget(self.yaw_dial)
@@ -264,6 +401,7 @@ class Ui_HexapodController(object):
         self.pitch_dial.setMaximumSize(QSize(80, 80))
         self.pitch_dial.setMinimum(-250)
         self.pitch_dial.setMaximum(250)
+        self.pitch_dial.setSingleStep(4)
         self.pitch_dial.setNotchesVisible(True)
 
         self.verticalLayout_6.addWidget(self.pitch_dial)
@@ -287,6 +425,8 @@ class Ui_HexapodController(object):
         self.roll_dial.setMaximumSize(QSize(80, 80))
         self.roll_dial.setMinimum(-120)
         self.roll_dial.setMaximum(120)
+        self.roll_dial.setSingleStep(2)
+        self.roll_dial.setPageStep(10)
         self.roll_dial.setNotchesVisible(True)
 
         self.verticalLayout_7.addWidget(self.roll_dial)
@@ -304,19 +444,58 @@ class Ui_HexapodController(object):
         self.widget_8.setObjectName(u"widget_8")
         self.verticalLayout_8 = QVBoxLayout(self.widget_8)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.step_height_slider = QSlider(self.widget_8)
+        self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.widget_21 = QWidget(self.widget_8)
+        self.widget_21.setObjectName(u"widget_21")
+        self.verticalLayout_14 = QVBoxLayout(self.widget_21)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_11)
+
+        self.step_height_slider = QSlider(self.widget_21)
         self.step_height_slider.setObjectName(u"step_height_slider")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.step_height_slider.sizePolicy().hasHeightForWidth())
         self.step_height_slider.setSizePolicy(sizePolicy3)
-        self.step_height_slider.setMinimumSize(QSize(0, 80))
-        self.step_height_slider.setMaximumSize(QSize(16777215, 80))
+        self.step_height_slider.setMinimumSize(QSize(0, 15))
+        self.step_height_slider.setMaximumSize(QSize(16777215, 15))
         self.step_height_slider.setMaximum(150)
         self.step_height_slider.setOrientation(Qt.Horizontal)
 
-        self.verticalLayout_8.addWidget(self.step_height_slider)
+        self.verticalLayout_14.addWidget(self.step_height_slider)
+
+        self.widget_22 = QWidget(self.widget_21)
+        self.widget_22.setObjectName(u"widget_22")
+        self.horizontalLayout_12 = QHBoxLayout(self.widget_22)
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.label_20 = QLabel(self.widget_22)
+        self.label_20.setObjectName(u"label_20")
+
+        self.horizontalLayout_12.addWidget(self.label_20)
+
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_8)
+
+        self.label_19 = QLabel(self.widget_22)
+        self.label_19.setObjectName(u"label_19")
+
+        self.horizontalLayout_12.addWidget(self.label_19)
+
+
+        self.verticalLayout_14.addWidget(self.widget_22)
+
+        self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_10)
+
+
+        self.verticalLayout_8.addWidget(self.widget_21)
 
         self.label_6 = QLabel(self.widget_8)
         self.label_6.setObjectName(u"label_6")
@@ -415,14 +594,25 @@ class Ui_HexapodController(object):
     # setupUi
 
     def retranslateUi(self, HexapodController):
-        HexapodController.setWindowTitle(QCoreApplication.translate("HexapodController", u"Hexapod Controller", None))
+        HexapodController.setWindowTitle(QCoreApplication.translate("HexapodController", u"Elkapod Controller", None))
+        self.label_14.setText(QCoreApplication.translate("HexapodController", u"0.000", None))
+        self.label_15.setText(QCoreApplication.translate("HexapodController", u"0.023", None))
+        self.label_13.setText(QCoreApplication.translate("HexapodController", u"0.046", None))
+        self.label_18.setText(QCoreApplication.translate("HexapodController", u"0.0", None))
+        self.label_17.setText(QCoreApplication.translate("HexapodController", u"0.2", None))
+        self.label_16.setText(QCoreApplication.translate("HexapodController", u"0.4", None))
         self.label_9.setText(QCoreApplication.translate("HexapodController", u"Corpus Position", None))
         self.label.setText(QCoreApplication.translate("HexapodController", u"v direction", None))
+        self.label_12.setText(QCoreApplication.translate("HexapodController", u"0.000m/s", None))
+        self.label_11.setText(QCoreApplication.translate("HexapodController", u"0.015m/s", None))
+        self.label_10.setText(QCoreApplication.translate("HexapodController", u"0.030m/s", None))
         self.label_2.setText(QCoreApplication.translate("HexapodController", u"v value", None))
         self.label_3.setText(QCoreApplication.translate("HexapodController", u"omega", None))
         self.yaw_label.setText(QCoreApplication.translate("HexapodController", u"yaw", None))
         self.label_4.setText(QCoreApplication.translate("HexapodController", u"pitch", None))
         self.label_5.setText(QCoreApplication.translate("HexapodController", u"roll", None))
+        self.label_20.setText(QCoreApplication.translate("HexapodController", u"0.000", None))
+        self.label_19.setText(QCoreApplication.translate("HexapodController", u"0.015", None))
         self.label_6.setText(QCoreApplication.translate("HexapodController", u"step height", None))
         self.label_7.setText(QCoreApplication.translate("HexapodController", u"Gait", None))
         self.gait_selection.setCurrentText("")
