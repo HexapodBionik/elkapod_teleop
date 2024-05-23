@@ -14,3 +14,21 @@ git clone https://github.com/HexapodBionik/elkapod_teleop.git elkapod_teleop/src
 cd elkapod_teleop/src/
 vcs import . < repos.yaml
 ```
+
+## Elkapod Control using joystick controller
+Currently only Xbox controllers are supported
+
+First of all build the workspace and source build packages.
+
+How to run?
+```bash
+ros2 launch elkapod_teleop_joy elkapod_joy_controller.launch.py
+```
+
+**Current key & axes binding**
+![binding](doc/images/elkapod_joy_controller_latest.png)
+
+## Credits
+Xbox® and Xbox Series X® Controller are registered trademarks of Microsoft Corporation.
+
+Binding template created by Goldwolf & Shoadow.
