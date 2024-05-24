@@ -13,7 +13,7 @@ class Mode(Enum):
 
 
 class ElkapodJoyController(Node):
-    _ROLL_PITCH_STEP = 0.001
+    _ROLL_PITCH_STEP = 0.005
     _BASE_HEIGHT_STEP = 0.001
     _WALK_MODES = ["3POINT", "MECHATRONIC"]
 
@@ -136,12 +136,14 @@ class ElkapodJoyController(Node):
         self._trajectory_parameters.vdir = v_lin_dir
 
         # Angular velocity
-        if not round(axes[5]):
+        if (1 - round(max(0.001, axes[5]))):
             self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[5]), 2))
-        elif not round(axes[4]):
+            self._trajectory_parameters.step_height = 0.02
+        elif (1 - round(max(0.001, axes[4]))):
             self._trajectory_parameters.omega = -self._vel * (1 - round(max(0.001, axes[4]), 2))
         else:
             self._trajectory_parameters.omega = 0.0
+            self._trajectory_parameters.step_height = 0.07
 
         # Roll and Pitch control
         self._trajectory_parameters.pitch += self._ROLL_PITCH_STEP * axes[3]
@@ -174,7 +176,7 @@ class ElkapodJoyController(Node):
             self._trajectory_parameters.height = self._min_height
 
         # When pad is IDLE
-        if self._trajectory_parameters.vval <= 1e-4 and self._trajectory_parameters.omega <= 1e-4:
+        if self._trajectory_parameters.vval <= 1e-4 and abs(self._trajectory_parameters.omega) <= 1e-4:
             self._trajectory_parameters.gait = "STAND"
         else:
             self._trajectory_parameters.gait = self._walk_mode_string
