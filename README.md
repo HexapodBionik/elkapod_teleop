@@ -41,8 +41,8 @@ ros2 run elkapod_controller_gui elkapod_controller_gui
 - Second slider controls the height of the corpus
 - `Corpus Position` controls 
 - `v direction` - the direction of move, relative to Elkapod head
-- `v value` - velocity of moving
-- `omega` - ?
+- `v value` - linear velocity of moving
+- `omega` - angular velocity of moving
 - `yaw` - roll
 - `pitch` - pitch
 - `roll` - yaw
