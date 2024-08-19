@@ -23,7 +23,8 @@ setup(
     entry_points={
         'console_scripts': [
             'elkapod_leg_joy_controller = elkapod_teleop_joy.elkapod_leg_joy_controller:main',
-            'elkapod_joy_controller = elkapod_teleop_joy.elkapod_joy_controller:main'
+            'elkapod_joy_controller = elkapod_teleop_joy.elkapod_joy_controller:main',
+            'stability_check = elkapod_teleop_joy.stability_check:main'
         ],
     },
 )
