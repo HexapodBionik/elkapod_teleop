@@ -17,7 +17,7 @@ from threading import Thread
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 
-from elkapod_msgs.msg import TrajectoryParameters
+from elkapod_msgs.msg import TrajectoryUserParameters
 from .elkapod_controller_ui import Ui_HexapodController
 
 
@@ -39,7 +39,7 @@ class ApplicationMainWindow(QMainWindow):
         self.ui.corpus_position.mousePressEvent = \
             self.update_corpus_position
 
-        self.trajectory_parameters = TrajectoryParameters()
+        self.trajectory_parameters = TrajectoryUserParameters()
         self.trajectory_parameters.leg_spacing = 0.6
         self.trajectory_parameters.height = 0.1
         self.trajectory_parameters.vdir = math.pi/2
@@ -336,8 +336,8 @@ class ElkapodControllerGui(Node):
         super().__init__("ElkapodControllerGui")
 
         self._publisher = self.create_publisher(
-            TrajectoryParameters,
-            "elkapod_trajectory_parameters",
+            TrajectoryUserParameters,
+            "elkapod_trajectory_user_parameters",
             10,
         )
 
