@@ -61,8 +61,8 @@ class ElkapodJoyController(Node):
         axes = msg.axes.tolist()
         buttons = msg.buttons.tolist()
 
-        self._trajectory_parameters.vval = self._vel * (1-round(max(0.001, axes[4]), 2))
-        self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[5]), 2))
+        self._trajectory_parameters.vval = self._vel * (1-round(max(0.001, axes[7]), 2)) ###4
+        self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[7]), 2)) ###5
 
         if self._trajectory_parameters.vval > self._vel_max:
             self._trajectory_parameters.vval = self._vel_max
@@ -76,10 +76,10 @@ class ElkapodJoyController(Node):
             self._trajectory_parameters.gait = "3POINT"
 
         # Change mode
-        if self._mode == Mode.HEIGHT and buttons[15] and not self._clicked:
+        if self._mode == Mode.HEIGHT and buttons[1] and not self._clicked: ##12
             self._mode = Mode.BASE_ORIENTATION
             self._clicked = True
-        elif self._mode == Mode.BASE_ORIENTATION and buttons[15] and not self._clicked:
+        elif self._mode == Mode.BASE_ORIENTATION and buttons[1] and not self._clicked: ##12
             self._mode = Mode.HEIGHT
             self._clicked = True
         else:
@@ -87,15 +87,15 @@ class ElkapodJoyController(Node):
 
         # Height
         if self._mode == Mode.HEIGHT:
-            self._trajectory_parameters.height += step * axes[7]
+            self._trajectory_parameters.height += step * axes[7] ###7
             if self._trajectory_parameters.height >= self._max_height:
                 self._trajectory_parameters.height = self._max_height
             elif self._trajectory_parameters.height <= self._min_height:
                 self._trajectory_parameters.height = self._min_height
 
         elif self._mode == Mode.BASE_ORIENTATION:
-            self._trajectory_parameters.pitch += step * axes[7]
-            self._trajectory_parameters.yaw += step * axes[6]
+            self._trajectory_parameters.pitch += step * axes[7] ###7
+            self._trajectory_parameters.yaw += step * axes[7] ###6
 
             if self._trajectory_parameters.pitch >= self._euler_max:
                 self._trajectory_parameters.pitch = self._euler_max
@@ -107,7 +107,7 @@ class ElkapodJoyController(Node):
             elif self._trajectory_parameters.yaw <= self._euler_min:
                 self._trajectory_parameters.yaw = self._euler_min
 
-            if buttons[13]:
+            if buttons[1]: ##13
                 self._trajectory_parameters.pitch = 0.0
                 self._trajectory_parameters.yaw = 0.0
 
@@ -136,18 +136,18 @@ class ElkapodJoyController(Node):
         self._trajectory_parameters.vdir = v_lin_dir
 
         # Angular velocity
-        if (1 - round(max(0.001, axes[5]))):
-            self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[5]), 2))
-            self._trajectory_parameters.step_height = 0.02
-        elif (1 - round(max(0.001, axes[4]))):
-            self._trajectory_parameters.omega = -self._vel * (1 - round(max(0.001, axes[4]), 2))
+        if (1 - round(max(0.001, axes[2]))):
+            self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[2]), 2))
+            self._trajectory_parameters.step_height = 0.07
+        elif (1 - round(max(0.001, axes[5]))):
+            self._trajectory_parameters.omega = -self._vel * (1 - round(max(0.001, axes[5]), 2))
         else:
             self._trajectory_parameters.omega = 0.0
             self._trajectory_parameters.step_height = 0.07
 
         # Roll and Pitch control
-        self._trajectory_parameters.pitch += self._ROLL_PITCH_STEP * axes[3]
-        self._trajectory_parameters.yaw -= self._ROLL_PITCH_STEP * axes[2]
+        self._trajectory_parameters.pitch -= self._ROLL_PITCH_STEP * axes[4]
+        self._trajectory_parameters.yaw -= self._ROLL_PITCH_STEP * axes[3]
 
         if self._trajectory_parameters.pitch >= self._euler_max:
             self._trajectory_parameters.pitch = self._euler_max
@@ -159,7 +159,7 @@ class ElkapodJoyController(Node):
         elif self._trajectory_parameters.yaw <= self._euler_min:
             self._trajectory_parameters.yaw = self._euler_min
 
-        if buttons[14]:
+        if buttons[12]:
             self._trajectory_parameters.pitch = 0.0
             self._trajectory_parameters.yaw = 0.0
             self.get_logger().info("Roll and pitch of the main body moved to zero positions")
@@ -167,7 +167,7 @@ class ElkapodJoyController(Node):
         # Base height
         if buttons[0]:
             self._trajectory_parameters.height -= self._BASE_HEIGHT_STEP
-        elif buttons[4]:
+        elif buttons[2]:
             self._trajectory_parameters.height += self._BASE_HEIGHT_STEP
 
         if self._trajectory_parameters.height >= self._max_height:
@@ -182,13 +182,13 @@ class ElkapodJoyController(Node):
             self._trajectory_parameters.gait = self._walk_mode_string
 
         # Change Walk mode
-        if buttons[3] and (
+        if buttons[3] and ( ##3
                 self._walk_mode == 0 or self._walk_mode == 2) and self._trajectory_parameters.gait == "STAND":
             self._trajectory_parameters.gait = "3POINT"
             self._walk_mode_string = "3POINT"
             self._walk_mode = 1
             self.get_logger().info("Changed walk mode to 3POINT")
-        elif buttons[3] and (
+        elif buttons[3] and ( ##3
                 self._walk_mode == 0 or self._walk_mode == 1) and self._trajectory_parameters.gait == "STAND":
             self._trajectory_parameters.gait = "MECHATRONIC"
             self._walk_mode_string = "MECHATRONIC"
