@@ -1,373 +1,261 @@
 from PySide6.QtWidgets import (
-    QApplication,
-    QGraphicsScene,
     QMainWindow,
+    QMessageBox
 )
-from PySide6.QtGui import (
-    QColor,
-    QPolygonF,
-    QMouseEvent,
-)
-from PySide6.QtCore import QPoint
 
-import sys
 import math
-import rclpy
-from threading import Thread
-from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
 
-from elkapod_msgs.msg import TrajectoryParameters
 from .elkapod_controller_ui import Ui_HexapodController
+from .elkapod_gui_node import SpeedCommand, GaitType
+from enum import Enum
 
+class RobotState(Enum):
+    START = 0
+    INIT = 1
+    IDLE = 2
+    WALKING = 3
 
 class ApplicationMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.ui = Ui_HexapodController()
-        self.ui.setupUi(self)
-
-        self.setup()
+        self._ui = Ui_HexapodController()
+        self._ui.setupUi(self)
 
     def setup(self):
-        self.leg_spacing_scene = self.draw_leg_spacing_scene(40)
-        self.ui.leg_spacing_view.setScene(self.leg_spacing_scene)
-        self.height_scene = self.draw_height_scene(20)
-        self.ui.height_view.setScene(self.height_scene)
-        self.corpus_position_scene = self.draw_corpus_position_scene((0., 0.))
-        self.ui.corpus_position.setScene(self.corpus_position_scene)
-        self.ui.corpus_position.mousePressEvent = \
-            self.update_corpus_position
+        self._ui.vdir_dial.sliderMoved.connect(self._update_vdir_dial)
+        self._ui.vdir_spinbox.valueChanged.connect(self._update_vdir_spinbox)
 
-        self.trajectory_parameters = TrajectoryParameters()
-        self.trajectory_parameters.leg_spacing = 0.6
-        self.trajectory_parameters.height = 0.1
-        self.trajectory_parameters.vdir = math.pi/2
-        self.trajectory_parameters.vval = 0.
-        self.trajectory_parameters.omega = 0.
-        self.trajectory_parameters.yaw = 0.
-        self.trajectory_parameters.pitch = 0.
-        self.trajectory_parameters.roll = 0.
-        self.trajectory_parameters.step_height = 0.
-        self.trajectory_parameters.corpus_position = [0., 0.]
-        self.trajectory_parameters.cycle_time = 6.
-        self.trajectory_parameters.supportive_legs = [True for _ in range(6)]
-        self.trajectory_parameters.gait = "3POINT"
+        self._ui.vval_slider.sliderMoved.connect(self._update_vval_slider)
+        self._ui.vval_spinbox.valueChanged.connect(self._update_vval_spinbox)
+        self._ui.vval_stop_button.pressed.connect(self._update_vval_button)
 
-        self.ui.leg_spacing_slider.sliderMoved.connect(self.update_leg_spacing)
-        self.ui.height_slider.sliderMoved.connect(self.update_height)
-        self.ui.vdir_dial.sliderMoved.connect(self.update_vdir)
-        self.ui.vval_slider.sliderMoved.connect(self.update_vval)
-        self.ui.omega_dial.sliderMoved.connect(self.update_omega)
-        self.ui.yaw_dial.sliderMoved.connect(self.update_yaw)
-        self.ui.pitch_dial.sliderMoved.connect(self.update_pitch)
-        self.ui.roll_dial.sliderMoved.connect(self.update_roll)
-        self.ui.step_height_slider.sliderMoved.connect(self.update_step_height)
+        self._ui.init_transition_button.pressed.connect(self._send_init_transition)
+        self._ui.idle_transition_button.pressed.connect(self._send_idle_transition)
+        self._ui.walk_transition_button.pressed.connect(self._send_walk_transition)
 
-        self.ui.gait_selection.addItems([
-            '3POINT',
+        self.node.ros2_qt_bridge.send_async_cmd_signal.connect(self._on_transition_result)
+
+        self._ui.angular_vel_slider.sliderMoved.connect(self._update_angular_vel_slider)
+        self._ui.angular_vel_spinbox.valueChanged.connect(self._update_angular_vel_spinbox)
+        self._ui.angular_vel_stopbutton.pressed.connect(self._update_angular_vel_button)
+
+        self._ui.roll_slider.sliderMoved.connect(self._update_roll_slider)
+        self._ui.roll_spinbox.valueChanged.connect(self._update_roll_spinbox)
+        self._ui.roll_reset_button.pressed.connect(self._update_roll_button)
+
+        self._ui.pitch_slider.sliderMoved.connect(self._update_pitch_slider)
+        self._ui.pitch_spinbox.valueChanged.connect(self._update_pitch_spinbox)
+        self._ui.pitch_reset_button.pressed.connect(self._update_pitch_button)
+
+        self._ui.base_height_slider.sliderMoved.connect(self._update_base_height_slider)
+        self._ui.base_height_spinbox.valueChanged.connect(self._update_base_height_spinbox)
+        self._ui.base_height_default_button.pressed.connect(self._update_base_height_button)
+
+        self._ui.actionAbout.triggered.connect(self._show_about_message)
+
+        self._ui.gait_selection.addItems([
+            'TRIPOD',
+            'WAVE',
             'RIPPLE',
-            'MECHATRONIC',
-            'STAND',
         ])
-        self.ui.gait_selection.currentTextChanged.connect(self.update_gait)
+        self._ui.gait_selection.currentTextChanged.connect(self._update_gait)
 
-        self.sl_checkboxes = [self.ui.checkBox_1, self.ui.checkBox_2,
-                              self.ui.checkBox_3, self.ui.checkBox_4,
-                              self.ui.checkBox_5, self.ui.checkBox_6]
-        for checkbox in self.sl_checkboxes:
-            checkbox.setEnabled(False)
-            checkbox.setChecked(True)
-            checkbox.toggled.connect(self.update_supportive_legs)
+        self._robot_state = RobotState.START
+        self._next_state = None
 
-        self.allowed_non_sl = 0
+        self._speed = SpeedCommand()
+        self._current_max_speed = 0.2
 
-    def update_leg_spacing(self, spacing):
-        self.leg_spacing_scene = self.draw_leg_spacing_scene((spacing-40)//2)
-        self.ui.leg_spacing_view.setScene(self.leg_spacing_scene)
+    def _send_angular_vel_command(self, omega: float):
+        self._ui.vval_slider.setValue(0.0)
+        self._ui.vval_spinbox.setValue(0.0)
 
-        self.trajectory_parameters.leg_spacing = float(spacing)*0.005
-        self.send_trajectory_parameters(self.trajectory_parameters)
+        self._speed.vx = 0.0
+        self._speed.vy = 0.0
+        self._speed.omega = omega
+        self.node.send_vel_command(self._speed)
 
-    def update_height(self, height):
-        self.height_scene = self.draw_height_scene(height//5)
-        self.ui.height_view.setScene(self.height_scene)
+    def _update_angular_vel_slider(self, omega: str):
+        omega = -0.5 + float(omega) / 100.
+        self._ui.angular_vel_spinbox.setValue(omega)
+        self._send_angular_vel_command(omega)
 
-        self.trajectory_parameters.height = float(height)*0.001
-        self.send_trajectory_parameters(self.trajectory_parameters)
+    def _update_angular_vel_spinbox(self, omega: str):
+        omega = float(omega)
+        slider_value = (omega + 0.5) * 100.
+        self._ui.angular_vel_slider.setValue(slider_value)
+        self._send_angular_vel_command(omega)
 
-    def update_corpus_position(self, event: QMouseEvent):
-        position = (
-            self.ui.corpus_position.mapToScene(event.position().toPoint()).x(),
-            self.ui.corpus_position.mapToScene(event.position().toPoint()).y(),
-        )
-        self.corpus_position_scene = self.draw_corpus_position_scene(position)
-        self.ui.corpus_position.setScene(self.corpus_position_scene)
-        self.trajectory_parameters.corpus_position = [
-            float(position[0])*0.000833,
-            float(position[1])*0.000833,
-        ]
-        self.send_trajectory_parameters(self.trajectory_parameters)
+    def _update_angular_vel_button(self):
+        self._ui.angular_vel_spinbox.setValue(0.0)
+        self._ui.angular_vel_slider.setValue(50)
+        self._send_angular_vel_command(0.0)
+
+    def _update_roll_slider(self, roll: str):
+        roll_deg = -3.0 + (float(roll) / 100.)*6.
+        roll_rad = roll_deg * math.pi / 180.
+        self._ui.roll_spinbox.setValue(roll_deg)
+        self.node.send_roll_command(roll_rad)
+
+    def _update_roll_spinbox(self, roll: str):
+        roll_deg = float(roll)
+        roll_rad = roll_deg * math.pi / 180.
+        slider_value = (roll_deg + 3.0) / 6. * 100.
+        self._ui.roll_slider.setValue(slider_value)
+        self.node.send_roll_command(roll_rad)
+
+    def _update_roll_button(self):
+        self._ui.roll_spinbox.setValue(0.0)
+        self._ui.roll_slider.setValue(50)
+        self.node.send_roll_command(0.0)
+
+    def _update_pitch_slider(self, pitch: str):
+        pitch_deg = -6.0 + (float(pitch) / 100.)*12.
+        pitch_rad = pitch_deg * math.pi / 180.
+        self._ui.pitch_spinbox.setValue(pitch_deg)
+        self.node.send_pitch_command(pitch_rad)
+    
+    def _update_pitch_spinbox(self, pitch: str):
+        pitch_deg = float(pitch)
+        pitch_rad = pitch_deg * math.pi / 180.
+        slider_value = (pitch_deg + 6.0) / 12. * 100.
+        self._ui.pitch_slider.setValue(slider_value)
+        self.node.send_pitch_command(pitch_rad)
+
+    def _update_pitch_button(self):
+        self._ui.pitch_spinbox.setValue(0.0)
+        self._ui.pitch_slider.setValue(50)
+        self.node.send_pitch_command(0.0)
+
+    def _update_base_height_slider(self, height: str):
+        base_height = 0.09 + (float(height) / 100.)*0.07
+        self._ui.base_height_spinbox.setValue(base_height)
+        self.node.send_base_height_command(base_height)
+
+    def _update_base_height_spinbox(self, height: str):
+        base_height = float(height)
+        slider_value = (base_height - 0.09) / 0.07 * 100.
+        self._ui.base_height_slider.setValue(slider_value)
+        self.node.send_base_height_command(base_height)
+
+    def _update_base_height_button(self):
+        self._ui.base_height_slider.setValue(43)
+        self._ui.base_height_spinbox.setValue(0.12)
+        self.node.send_base_height_command(0.12)
+
+    def _send_idle_transition(self):
+        self._ui.transition_status_label.setText("started")
+        self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
+
+        if self._robot_state == RobotState.INIT:
+            self.node.send_motion_manager_transition("stand_up")
+        elif self._robot_state == RobotState.WALKING:
+            self.node.send_walk_disable_cmd()
+        self._next_state = RobotState.IDLE
+
+    def _send_walk_transition(self):
+        self._ui.transition_status_label.setText("started")
+        self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
+    
+        self.node.send_walk_enable_cmd()
+        self._next_state = RobotState.WALKING
+
+    def _send_init_transition(self):
+        self._ui.transition_status_label.setText("started")
+        self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
+
+        if self._robot_state == RobotState.START:
+            self.node.send_motion_manager_transition("init")
+        elif self._robot_state == RobotState.IDLE:
+            self.node.send_motion_manager_transition("lower")
+        self._next_state = RobotState.INIT
+
+    def _on_transition_result(self, result: bool):
+        if result:
+            self._ui.transition_status_label.setText("success")
+            self._ui.transition_status_label.setStyleSheet("color: #88E788")
+            match self._next_state:
+                case RobotState.INIT:
+                    self._ui.idle_transition_button.setEnabled(True)
+                    self._ui.init_transition_button.setDisabled(True)
+                    self._ui.walk_transition_button.setDisabled(True)
+                case RobotState.IDLE:
+                    self._ui.walk_transition_button.setEnabled(True)
+                    self._ui.init_transition_button.setEnabled(True)
+                    self._ui.idle_transition_button.setDisabled(True)
+                    self._ui.Walk.setDisabled(True)
+                case RobotState.WALKING:
+                    self._ui.idle_transition_button.setEnabled(True)
+                    self._ui.walk_transition_button.setDisabled(True)
+                    self._ui.init_transition_button.setDisabled(True)
+                    self._ui.Walk.setEnabled(True)
+
+            self._robot_state = self._next_state
+            self._next_state = None
+        else:
+            self._next_state = None
+            self._ui.transition_status_label.setText("failed")
+            self._ui.transition_status_label.setStyleSheet("color: #DA2C43")
+
+    def _update_vval_slider(self, vval):
+        value = float(vval) / 100. * self._current_max_speed
+        self._ui.vval_spinbox.setValue(value)
+        self._update_vval(value)
+
+    def _update_vval_spinbox(self, vval):
+        slider_value = min(round(float(vval) / self._current_max_speed * 100.), 100)
+        self._ui.vval_slider.setValue(slider_value)
+        self._update_vval(float(vval))
+
+    def _update_vval_button(self):
+        self._ui.vval_slider.setValue(0.0)
+        self._ui.vval_spinbox.setValue(0.0)
+        self._update_vval(0.0)
+
+    def _update_vval(self, vval):
+        vval = float(vval)
+        vdir = 0.0
+        if self._speed.norm() > 0.0:
+            vdir = math.atan2(self._speed.vy, self._speed.vx)
+        
+        self._speed.vx = math.cos(vdir) * vval
+        self._speed.vy = math.sin(vdir) * vval
+        self.node.send_vel_command(self._speed)
+
+    def _update_vdir_dial(self, vdir):
+        vdir = -float(vdir) + 180.
+        self._ui.vdir_spinbox.setValue(vdir)
+        self.update_vdir(vdir)
+
+    def _update_vdir_spinbox(self, vdir):
+        vdir = float(vdir)
+        self.update_vdir(vdir)
+        self._ui.vdir_dial.setValue(-vdir + 180.0)
 
     def update_vdir(self, vdir):
-        self.trajectory_parameters.vdir = ((float(vdir)+90.)/360.)*2*math.pi
-        self.send_trajectory_parameters(self.trajectory_parameters)
+        vdir = vdir * math.pi / 180.
+        vval = self._speed.norm()
 
-    def update_vval(self, vval):
-        self.trajectory_parameters.vval = float(vval)*0.0003
-        self.send_trajectory_parameters(self.trajectory_parameters)
+        self._speed.vx = math.cos(vdir) * vval
+        self._speed.vy = math.sin(vdir) * vval
+        self.node.send_vel_command(self._speed)
 
-    def update_omega(self, omega):
-        self.trajectory_parameters.omega = -(float(omega)*2*math.pi/3600)
-        self.send_trajectory_parameters(self.trajectory_parameters)
+    def _update_gait(self, gait: str):
+        match gait:
+            case "TRIPOD":
+                gait_cmd = GaitType.TRIPOD
+            case "WAVE":
+                gait_cmd = GaitType.WAVE
+            case "RIPPLE":
+                gait_cmd = GaitType.RIPPLE
+            case _:
+                gait_cmd = GaitType.TRIPOD
+        self.node.send_gait_type_command(gait_cmd)
 
-    def update_yaw(self, yaw):
-        self.trajectory_parameters.yaw = float(yaw)*2*math.pi/3600
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def update_pitch(self, pitch):
-        self.trajectory_parameters.pitch = float(pitch)*2*math.pi/3600
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def update_roll(self, roll):
-        self.trajectory_parameters.roll = float(roll)*2*math.pi/3600
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def update_step_height(self, step_height):
-        self.trajectory_parameters.step_height = float(step_height)/10000.
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def update_gait(self, gait):
-        if gait == 'MECHATRONIC':
-            self.allowed_non_sl = 1
-            if sum(self.trajectory_parameters.supportive_legs) < 5:
-                for checkbox in self.sl_checkboxes:
-                    checkbox.setEnabled(False)
-
-                for checkbox in self.sl_checkboxes:
-                    if not checkbox.isChecked():
-                        checkbox.setChecked(True)
-                        break
-            elif sum(self.trajectory_parameters.supportive_legs) == 5:
-                for checkbox in self.sl_checkboxes:
-                    if checkbox.isChecked():
-                        checkbox.setEnabled(False)
-                    else:
-                        checkbox.setEnabled(True)
-            elif sum(self.trajectory_parameters.supportive_legs) >= 6:
-                for checkbox in self.sl_checkboxes:
-                    checkbox.setEnabled(True)
-        elif gait == 'STAND':
-            self.allowed_non_sl = 2
-
-            if sum(self.trajectory_parameters.supportive_legs) == 4:
-                for checkbox in self.sl_checkboxes:
-                    if checkbox.isChecked():
-                        checkbox.setEnabled(False)
-                    else:
-                        checkbox.setEnabled(True)
-            elif sum(self.trajectory_parameters.supportive_legs) >= 5:
-                for checkbox in self.sl_checkboxes:
-                    checkbox.setEnabled(True)
-        else:
-            self.allowed_non_sl = 0
-            for checkbox in self.sl_checkboxes:
-                checkbox.setEnabled(False)
-                if not checkbox.isChecked():
-                    checkbox.setChecked(True)
-
-        self.trajectory_parameters.gait = gait
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def update_supportive_legs(self):
-        self.trajectory_parameters.supportive_legs[int(self.sender().objectName()[-1])-1] = \
-            self.sender().isChecked()
-
-        if len(self.trajectory_parameters.supportive_legs) - sum(self.trajectory_parameters.supportive_legs) >= \
-           self.allowed_non_sl:
-            for checkbox in self.sl_checkboxes:
-                if checkbox.isChecked():
-                    checkbox.setEnabled(False)
-                else:
-                    checkbox.setEnabled(True)
-        else:
-            for checkbox in self.sl_checkboxes:
-                checkbox.setEnabled(True)
-
-        self.send_trajectory_parameters(self.trajectory_parameters)
-
-    def draw_corpus_position_scene(self, position):
-        scene = QGraphicsScene(self)
-        scene.addLine(-50., 0., 50., 0.)
-        scene.addLine(0., -80., 0., 80.)
-        scene.addEllipse(
-            position[0]-2., position[1]-2., 4., 4.,
-            QColor(255, 0, 0, 255),
-            QColor(255, 0, 0, 255),
+    def _show_about_message(self):
+        QMessageBox.information(
+            self,
+            "Elkapod Control GUI",
+            "Version: 1.0.0\n"
+            "Copyright (c) 2025 Elkapod Bionik, WUT"
         )
-
-        return scene
-
-    def draw_leg_spacing_scene(self, leg_len):
-        scene = QGraphicsScene(self)
-
-        corpus = QPolygonF([
-            QPoint(0, 0),
-            QPoint(40, 0),
-            QPoint(40, 60),
-            QPoint(0, 60),
-        ])
-        leg1 = QPolygonF([
-            QPoint(-leg_len, 0),
-            QPoint(0, 0),
-            QPoint(0, 5),
-            QPoint(-leg_len, 5),
-        ])
-        leg2 = QPolygonF([
-            QPoint(-leg_len, 28),
-            QPoint(0, 28),
-            QPoint(0, 33),
-            QPoint(-leg_len, 33),
-        ])
-        leg3 = QPolygonF([
-            QPoint(-leg_len, 55),
-            QPoint(0, 55),
-            QPoint(0, 60),
-            QPoint(-leg_len, 60),
-        ])
-        leg4 = QPolygonF([
-            QPoint(40, 0),
-            QPoint(40+leg_len, 0),
-            QPoint(40+leg_len, 5),
-            QPoint(40, 5),
-        ])
-        leg5 = QPolygonF([
-            QPoint(40, 28),
-            QPoint(40+leg_len, 28),
-            QPoint(40+leg_len, 33),
-            QPoint(40, 33),
-        ])
-        leg6 = QPolygonF([
-            QPoint(40, 55),
-            QPoint(40+leg_len, 55),
-            QPoint(40+leg_len, 60),
-            QPoint(40, 60),
-        ])
-
-        scene.addPolygon(corpus,
-                         QColor(255, 0, 0, 255),
-                         QColor(255, 0, 0, 255))
-        scene.addPolygon(leg1,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leg2,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leg3,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leg4,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leg5,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leg6,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-
-        return scene
-
-    def draw_height_scene(self, height):
-        scene = QGraphicsScene(self)
-
-        corpus = QPolygonF([
-            QPoint(0, -3),
-            QPoint(40, -3),
-            QPoint(40, 7),
-            QPoint(0, 7),
-        ])
-        leglt = QPolygonF([
-            QPoint(-40, 0),
-            QPoint(0, 0),
-            QPoint(0, 5),
-            QPoint(-40, 5),
-        ])
-        legrt = QPolygonF([
-            QPoint(40, 0),
-            QPoint(80, 0),
-            QPoint(80, 5),
-            QPoint(40, 5),
-        ])
-        leglb = QPolygonF([
-            QPoint(-40, 5),
-            QPoint(-35, 5),
-            QPoint(-35, 5+height),
-            QPoint(-40, 5+height),
-        ])
-        legrb = QPolygonF([
-            QPoint(75, 5),
-            QPoint(80, 5),
-            QPoint(80, 5+height),
-            QPoint(75, 5+height),
-        ])
-
-        scene.addPolygon(corpus,
-                         QColor(255, 0, 0, 255),
-                         QColor(255, 0, 0, 255))
-        scene.addPolygon(leglt,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(leglb,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(legrt,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-        scene.addPolygon(legrb,
-                         QColor(0, 0, 0, 255),
-                         QColor(0, 0, 0, 255))
-
-        return scene
-
-
-class ElkapodControllerGui(Node):
-    def __init__(self):
-        super().__init__("ElkapodControllerGui")
-
-        self._publisher = self.create_publisher(
-            TrajectoryParameters,
-            "elkapod_trajectory_parameters",
-            10,
-        )
-
-    def send_trajectory_parameters(self, params):
-        self._publisher.publish(params)
-
-
-def main(args=None):
-    rclpy.init(args=args)
-
-    app = QApplication()
-    window = ApplicationMainWindow()
-    ros_node = ElkapodControllerGui()
-
-    window.send_trajectory_parameters = (
-        lambda params: ros_node.send_trajectory_parameters(params)
-    )
-    executor = MultiThreadedExecutor()
-    executor.add_node(ros_node)
-
-    thread = Thread(target=executor.spin)
-    thread.start()
-
-    try:
-        window.show()
-        sys.exit(app.exec())
-    finally:
-        ros_node.destroy_node()
-        executor.shutdown()
-
-
-if __name__ == "__main__":
-    main()

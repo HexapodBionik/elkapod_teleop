@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'elkapod_controller.ui'
+## Form generated from reading UI file 'elkapod_controller2ioQTpw.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.2
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -11,235 +11,185 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDial,
-    QGraphicsView, QHBoxLayout, QLabel, QMainWindow,
-    QSizePolicy, QSlider, QSpacerItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDial, QDoubleSpinBox,
+    QFrame, QHBoxLayout, QLabel, QMainWindow,
+    QMenu, QMenuBar, QProgressBar, QPushButton,
+    QSizePolicy, QSlider, QSpacerItem, QSpinBox,
+    QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_HexapodController(object):
     def setupUi(self, HexapodController):
         if not HexapodController.objectName():
             HexapodController.setObjectName(u"HexapodController")
-        HexapodController.resize(564, 637)
+        HexapodController.resize(900, 800)
+        icon = QIcon()
+        iconThemeName = u"battery"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon = QIcon.fromTheme(iconThemeName)
+        else:
+            icon.addFile(u".", QSize(), QIcon.Normal, QIcon.Off)
+
+        HexapodController.setWindowIcon(icon)
+        self.actionAbout = QAction(HexapodController)
+        self.actionAbout.setObjectName(u"actionAbout")
         self.central_widget = QWidget(HexapodController)
         self.central_widget.setObjectName(u"central_widget")
         self.verticalLayout_2 = QVBoxLayout(self.central_widget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.widget_13 = QWidget(self.central_widget)
-        self.widget_13.setObjectName(u"widget_13")
-        self.horizontalLayout_8 = QHBoxLayout(self.widget_13)
+        self.tabWidget = QTabWidget(self.central_widget)
+        self.tabWidget.setObjectName(u"tabWidget")
+        self.Init = QWidget()
+        self.Init.setObjectName(u"Init")
+        self.verticalLayout_14 = QVBoxLayout(self.Init)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_6 = QVBoxLayout()
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.horizontalLayout_8 = QHBoxLayout()
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.horizontalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.widget_12 = QWidget(self.widget_13)
-        self.widget_12.setObjectName(u"widget_12")
-        self.verticalLayout_9 = QVBoxLayout(self.widget_12)
-        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.leg_spacing_widget = QWidget(self.widget_12)
-        self.leg_spacing_widget.setObjectName(u"leg_spacing_widget")
-        self.leg_spacing_widget.setEnabled(True)
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        self.horizontalLayout_8.setContentsMargins(-1, 0, -1, 0)
+        self.transition_status_title = QLabel(self.Init)
+        self.transition_status_title.setObjectName(u"transition_status_title")
+
+        self.horizontalLayout_8.addWidget(self.transition_status_title)
+
+        self.transition_status_label = QLabel(self.Init)
+        self.transition_status_label.setObjectName(u"transition_status_label")
+
+        self.horizontalLayout_8.addWidget(self.transition_status_label)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_8.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_8)
+
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalLayout_7.setContentsMargins(-1, 10, -1, 10)
+        self.init_transition_button = QPushButton(self.Init)
+        self.init_transition_button.setObjectName(u"init_transition_button")
+        self.init_transition_button.setMinimumSize(QSize(0, 40))
+
+        self.horizontalLayout_7.addWidget(self.init_transition_button)
+
+        self.idle_transition_button = QPushButton(self.Init)
+        self.idle_transition_button.setObjectName(u"idle_transition_button")
+        self.idle_transition_button.setEnabled(False)
+        self.idle_transition_button.setMinimumSize(QSize(0, 40))
+
+        self.horizontalLayout_7.addWidget(self.idle_transition_button)
+
+        self.walk_transition_button = QPushButton(self.Init)
+        self.walk_transition_button.setObjectName(u"walk_transition_button")
+        self.walk_transition_button.setEnabled(False)
+        self.walk_transition_button.setMinimumSize(QSize(0, 40))
+
+        self.horizontalLayout_7.addWidget(self.walk_transition_button)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_7)
+
+
+        self.verticalLayout_14.addLayout(self.verticalLayout_6)
+
+        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_11)
+
+        self.horizontalLayout_14 = QHBoxLayout()
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_2)
+
+        self.label_6 = QLabel(self.Init)
+        self.label_6.setObjectName(u"label_6")
+        font = QFont()
+        font.setPointSize(20)
+        font.setBold(True)
+        self.label_6.setFont(font)
+
+        self.horizontalLayout_14.addWidget(self.label_6)
+
+        self.dial = QDial(self.Init)
+        self.dial.setObjectName(u"dial")
+
+        self.horizontalLayout_14.addWidget(self.dial)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_14.addLayout(self.horizontalLayout_14)
+
+        self.tabWidget.addTab(self.Init, "")
+        self.Walk = QWidget()
+        self.Walk.setObjectName(u"Walk")
+        self.Walk.setEnabled(False)
+        self.verticalLayout_16 = QVBoxLayout(self.Walk)
+        self.verticalLayout_16.setObjectName(u"verticalLayout_16")
+        self.verticalLayout_15 = QVBoxLayout()
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.verticalWidget_2 = QWidget(self.Walk)
+        self.verticalWidget_2.setObjectName(u"verticalWidget_2")
+        palette = QPalette()
+        brush = QBrush(QColor(60, 60, 60, 255))
+        brush.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.Window, brush)
+        brush1 = QBrush(QColor(50, 50, 50, 255))
+        brush1.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette.setBrush(QPalette.Disabled, QPalette.Window, brush)
+        self.verticalWidget_2.setPalette(palette)
+        self.velocity_widget = QVBoxLayout(self.verticalWidget_2)
+        self.velocity_widget.setObjectName(u"velocity_widget")
+        self.velocity_widget.setContentsMargins(-1, 10, -1, 10)
+        self.label_8 = QLabel(self.verticalWidget_2)
+        self.label_8.setObjectName(u"label_8")
+        font1 = QFont()
+        font1.setPointSize(18)
+        self.label_8.setFont(font1)
+        self.label_8.setFrameShape(QFrame.NoFrame)
+        self.label_8.setTextFormat(Qt.AutoText)
+
+        self.velocity_widget.addWidget(self.label_8)
+
+        self.velocity_control_widget = QWidget(self.verticalWidget_2)
+        self.velocity_control_widget.setObjectName(u"velocity_control_widget")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.leg_spacing_widget.sizePolicy().hasHeightForWidth())
-        self.leg_spacing_widget.setSizePolicy(sizePolicy)
-        self.horizontalLayout_2 = QHBoxLayout(self.leg_spacing_widget)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.leg_spacing_view = QGraphicsView(self.leg_spacing_widget)
-        self.leg_spacing_view.setObjectName(u"leg_spacing_view")
-        self.leg_spacing_view.setEnabled(True)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.leg_spacing_view.sizePolicy().hasHeightForWidth())
-        self.leg_spacing_view.setSizePolicy(sizePolicy1)
-        self.leg_spacing_view.setMinimumSize(QSize(220, 80))
-        self.leg_spacing_view.setMaximumSize(QSize(220, 80))
-
-        self.horizontalLayout_2.addWidget(self.leg_spacing_view)
-
-        self.widget_17 = QWidget(self.leg_spacing_widget)
-        self.widget_17.setObjectName(u"widget_17")
-        self.verticalLayout_12 = QVBoxLayout(self.widget_17)
-        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
-        self.verticalSpacer_6 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_12.addItem(self.verticalSpacer_6)
-
-        self.leg_spacing_slider = QSlider(self.widget_17)
-        self.leg_spacing_slider.setObjectName(u"leg_spacing_slider")
-        self.leg_spacing_slider.setEnabled(True)
-        self.leg_spacing_slider.setMouseTracking(True)
-        self.leg_spacing_slider.setMinimum(40)
-        self.leg_spacing_slider.setMaximum(200)
-        self.leg_spacing_slider.setValue(120)
-        self.leg_spacing_slider.setOrientation(Qt.Horizontal)
-
-        self.verticalLayout_12.addWidget(self.leg_spacing_slider)
-
-        self.widget_18 = QWidget(self.widget_17)
-        self.widget_18.setObjectName(u"widget_18")
-        self.horizontalLayout_10 = QHBoxLayout(self.widget_18)
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
-        self.label_14 = QLabel(self.widget_18)
-        self.label_14.setObjectName(u"label_14")
-
-        self.horizontalLayout_10.addWidget(self.label_14)
-
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_10.addItem(self.horizontalSpacer_4)
-
-        self.label_15 = QLabel(self.widget_18)
-        self.label_15.setObjectName(u"label_15")
-
-        self.horizontalLayout_10.addWidget(self.label_15)
-
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
-
-        self.label_13 = QLabel(self.widget_18)
-        self.label_13.setObjectName(u"label_13")
-
-        self.horizontalLayout_10.addWidget(self.label_13)
-
-
-        self.verticalLayout_12.addWidget(self.widget_18)
-
-        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_12.addItem(self.verticalSpacer_7)
-
-
-        self.horizontalLayout_2.addWidget(self.widget_17)
-
-
-        self.verticalLayout_9.addWidget(self.leg_spacing_widget)
-
-        self.height_widget = QWidget(self.widget_12)
-        self.height_widget.setObjectName(u"height_widget")
-        sizePolicy.setHeightForWidth(self.height_widget.sizePolicy().hasHeightForWidth())
-        self.height_widget.setSizePolicy(sizePolicy)
-        self.horizontalLayout = QHBoxLayout(self.height_widget)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.height_view = QGraphicsView(self.height_widget)
-        self.height_view.setObjectName(u"height_view")
-        self.height_view.setMinimumSize(QSize(220, 80))
-        self.height_view.setMaximumSize(QSize(220, 80))
-
-        self.horizontalLayout.addWidget(self.height_view)
-
-        self.widget_19 = QWidget(self.height_widget)
-        self.widget_19.setObjectName(u"widget_19")
-        self.verticalLayout_13 = QVBoxLayout(self.widget_19)
-        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
-        self.verticalLayout_13.setContentsMargins(0, 0, 0, 0)
-        self.verticalSpacer_9 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_13.addItem(self.verticalSpacer_9)
-
-        self.height_slider = QSlider(self.widget_19)
-        self.height_slider.setObjectName(u"height_slider")
-        self.height_slider.setMaximum(230)
-        self.height_slider.setValue(100)
-        self.height_slider.setOrientation(Qt.Horizontal)
-
-        self.verticalLayout_13.addWidget(self.height_slider)
-
-        self.widget_20 = QWidget(self.widget_19)
-        self.widget_20.setObjectName(u"widget_20")
-        self.horizontalLayout_11 = QHBoxLayout(self.widget_20)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
-        self.label_18 = QLabel(self.widget_20)
-        self.label_18.setObjectName(u"label_18")
-
-        self.horizontalLayout_11.addWidget(self.label_18)
-
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_11.addItem(self.horizontalSpacer_6)
-
-        self.label_17 = QLabel(self.widget_20)
-        self.label_17.setObjectName(u"label_17")
-
-        self.horizontalLayout_11.addWidget(self.label_17)
-
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_11.addItem(self.horizontalSpacer_7)
-
-        self.label_16 = QLabel(self.widget_20)
-        self.label_16.setObjectName(u"label_16")
-
-        self.horizontalLayout_11.addWidget(self.label_16)
-
-
-        self.verticalLayout_13.addWidget(self.widget_20)
-
-        self.verticalSpacer_8 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_13.addItem(self.verticalSpacer_8)
-
-
-        self.horizontalLayout.addWidget(self.widget_19)
-
-
-        self.verticalLayout_9.addWidget(self.height_widget)
-
-
-        self.horizontalLayout_8.addWidget(self.widget_12)
-
-        self.widget_14 = QWidget(self.widget_13)
-        self.widget_14.setObjectName(u"widget_14")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.widget_14.sizePolicy().hasHeightForWidth())
-        self.widget_14.setSizePolicy(sizePolicy2)
-        self.verticalLayout_10 = QVBoxLayout(self.widget_14)
-        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.label_9 = QLabel(self.widget_14)
-        self.label_9.setObjectName(u"label_9")
-        self.label_9.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_10.addWidget(self.label_9)
-
-        self.corpus_position = QGraphicsView(self.widget_14)
-        self.corpus_position.setObjectName(u"corpus_position")
-        self.corpus_position.setMinimumSize(QSize(120, 180))
-        self.corpus_position.setMaximumSize(QSize(120, 180))
-
-        self.verticalLayout_10.addWidget(self.corpus_position)
-
-
-        self.horizontalLayout_8.addWidget(self.widget_14)
-
-
-        self.verticalLayout_2.addWidget(self.widget_13)
-
-        self.velocity_widget = QWidget(self.central_widget)
-        self.velocity_widget.setObjectName(u"velocity_widget")
-        sizePolicy.setHeightForWidth(self.velocity_widget.sizePolicy().hasHeightForWidth())
-        self.velocity_widget.setSizePolicy(sizePolicy)
-        self.horizontalLayout_4 = QHBoxLayout(self.velocity_widget)
+        sizePolicy.setHeightForWidth(self.velocity_control_widget.sizePolicy().hasHeightForWidth())
+        self.velocity_control_widget.setSizePolicy(sizePolicy)
+        self.horizontalLayout_4 = QHBoxLayout(self.velocity_control_widget)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.widget_3 = QWidget(self.velocity_widget)
-        self.widget_3.setObjectName(u"widget_3")
-        self.verticalLayout_3 = QVBoxLayout(self.widget_3)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalSpacer_4 = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.vdir_widget = QWidget(self.velocity_control_widget)
+        self.vdir_widget.setObjectName(u"vdir_widget")
+        self.vdir_widget.setAutoFillBackground(True)
+        self.velocity_direction = QVBoxLayout(self.vdir_widget)
+        self.velocity_direction.setObjectName(u"velocity_direction")
+        self.velocity_direction.setContentsMargins(10, -1, 10, -1)
+        self.velocity_dir_title = QLabel(self.vdir_widget)
+        self.velocity_dir_title.setObjectName(u"velocity_dir_title")
+        self.velocity_dir_title.setMinimumSize(QSize(0, 40))
+        self.velocity_dir_title.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_3.addItem(self.verticalSpacer_4)
+        self.velocity_direction.addWidget(self.velocity_dir_title)
 
-        self.vdir_dial = QDial(self.widget_3)
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.velocity_direction.addItem(self.verticalSpacer_6)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.vdir_dial = QDial(self.vdir_widget)
         self.vdir_dial.setObjectName(u"vdir_dial")
         self.vdir_dial.setMinimumSize(QSize(80, 80))
         self.vdir_dial.setMaximumSize(QSize(80, 16777215))
@@ -249,344 +199,453 @@ class Ui_HexapodController(object):
         self.vdir_dial.setWrapping(True)
         self.vdir_dial.setNotchesVisible(True)
 
-        self.verticalLayout_3.addWidget(self.vdir_dial)
+        self.horizontalLayout_2.addWidget(self.vdir_dial)
 
-        self.verticalSpacer_5 = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_3.addItem(self.verticalSpacer_5)
-
-        self.label = QLabel(self.widget_3)
+        self.verticalLayout_5 = QVBoxLayout()
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.label = QLabel(self.vdir_widget)
         self.label.setObjectName(u"label")
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy)
         self.label.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_3.addWidget(self.label)
+        self.verticalLayout_5.addWidget(self.label)
+
+        self.vdir_spinbox = QSpinBox(self.vdir_widget)
+        self.vdir_spinbox.setObjectName(u"vdir_spinbox")
+        self.vdir_spinbox.setMinimum(-180)
+        self.vdir_spinbox.setMaximum(180)
+        self.vdir_spinbox.setValue(0)
+
+        self.verticalLayout_5.addWidget(self.vdir_spinbox)
 
 
-        self.horizontalLayout_4.addWidget(self.widget_3)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_5)
 
-        self.widget_2 = QWidget(self.velocity_widget)
-        self.widget_2.setObjectName(u"widget_2")
-        self.verticalLayout = QVBoxLayout(self.widget_2)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalSpacer_2 = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout.addItem(self.verticalSpacer_2)
+        self.velocity_direction.addLayout(self.horizontalLayout_2)
 
-        self.widget_15 = QWidget(self.widget_2)
-        self.widget_15.setObjectName(u"widget_15")
-        self.verticalLayout_11 = QVBoxLayout(self.widget_15)
-        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
-        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
-        self.vval_slider = QSlider(self.widget_15)
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.velocity_direction.addItem(self.verticalSpacer_5)
+
+
+        self.horizontalLayout_4.addWidget(self.vdir_widget)
+
+        self.vval_widget = QWidget(self.velocity_control_widget)
+        self.vval_widget.setObjectName(u"vval_widget")
+        self.vval_widget.setAutoFillBackground(True)
+        self.velocity_value = QVBoxLayout(self.vval_widget)
+        self.velocity_value.setObjectName(u"velocity_value")
+        self.velocity_value_title = QLabel(self.vval_widget)
+        self.velocity_value_title.setObjectName(u"velocity_value_title")
+        self.velocity_value_title.setMinimumSize(QSize(0, 40))
+        self.velocity_value_title.setAlignment(Qt.AlignCenter)
+
+        self.velocity_value.addWidget(self.velocity_value_title)
+
+        self.verticalSpacer_7 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.velocity_value.addItem(self.verticalSpacer_7)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.vval_slider = QSlider(self.vval_widget)
         self.vval_slider.setObjectName(u"vval_slider")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.vval_slider.sizePolicy().hasHeightForWidth())
+        self.vval_slider.setSizePolicy(sizePolicy1)
+        self.vval_slider.setMinimumSize(QSize(0, 180))
+        self.vval_slider.setBaseSize(QSize(0, 0))
         self.vval_slider.setMaximum(100)
-        self.vval_slider.setOrientation(Qt.Horizontal)
-        self.vval_slider.setTickPosition(QSlider.NoTicks)
-        self.vval_slider.setTickInterval(0)
+        self.vval_slider.setOrientation(Qt.Vertical)
+        self.vval_slider.setInvertedAppearance(False)
+        self.vval_slider.setTickPosition(QSlider.TicksBelow)
 
-        self.verticalLayout_11.addWidget(self.vval_slider)
+        self.horizontalLayout.addWidget(self.vval_slider)
 
-        self.widget_16 = QWidget(self.widget_15)
-        self.widget_16.setObjectName(u"widget_16")
-        self.horizontalLayout_9 = QHBoxLayout(self.widget_16)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.label_12 = QLabel(self.widget_16)
-        self.label_12.setObjectName(u"label_12")
+        self.verticalLayout_13 = QVBoxLayout()
+        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.vval_spinbox = QDoubleSpinBox(self.vval_widget)
+        self.vval_spinbox.setObjectName(u"vval_spinbox")
+        self.vval_spinbox.setDecimals(3)
+        self.vval_spinbox.setMaximum(0.300000000000000)
+        self.vval_spinbox.setSingleStep(0.001000000000000)
 
-        self.horizontalLayout_9.addWidget(self.label_12)
+        self.verticalLayout_13.addWidget(self.vval_spinbox)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.vval_stop_button = QPushButton(self.vval_widget)
+        self.vval_stop_button.setObjectName(u"vval_stop_button")
 
-        self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
-
-        self.label_11 = QLabel(self.widget_16)
-        self.label_11.setObjectName(u"label_11")
-
-        self.horizontalLayout_9.addWidget(self.label_11)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_9.addItem(self.horizontalSpacer_2)
-
-        self.label_10 = QLabel(self.widget_16)
-        self.label_10.setObjectName(u"label_10")
-
-        self.horizontalLayout_9.addWidget(self.label_10)
+        self.verticalLayout_13.addWidget(self.vval_stop_button)
 
 
-        self.verticalLayout_11.addWidget(self.widget_16)
+        self.horizontalLayout.addLayout(self.verticalLayout_13)
 
 
-        self.verticalLayout.addWidget(self.widget_15)
+        self.velocity_value.addLayout(self.horizontalLayout)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout.addItem(self.verticalSpacer_3)
+        self.velocity_value.addItem(self.verticalSpacer_8)
 
-        self.label_2 = QLabel(self.widget_2)
+
+        self.horizontalLayout_4.addWidget(self.vval_widget)
+
+        self.angular_vel_widget = QWidget(self.velocity_control_widget)
+        self.angular_vel_widget.setObjectName(u"angular_vel_widget")
+        self.angular_vel_widget.setAutoFillBackground(True)
+        self.angular_velocity = QVBoxLayout(self.angular_vel_widget)
+        self.angular_velocity.setObjectName(u"angular_velocity")
+        self.angular_vel_title = QLabel(self.angular_vel_widget)
+        self.angular_vel_title.setObjectName(u"angular_vel_title")
+        self.angular_vel_title.setMinimumSize(QSize(0, 40))
+        self.angular_vel_title.setAlignment(Qt.AlignCenter)
+
+        self.angular_velocity.addWidget(self.angular_vel_title)
+
+        self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.angular_velocity.addItem(self.verticalSpacer_9)
+
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.angular_vel_slider = QSlider(self.angular_vel_widget)
+        self.angular_vel_slider.setObjectName(u"angular_vel_slider")
+        self.angular_vel_slider.setMinimumSize(QSize(0, 180))
+        self.angular_vel_slider.setMinimum(0)
+        self.angular_vel_slider.setMaximum(100)
+        self.angular_vel_slider.setValue(50)
+        self.angular_vel_slider.setOrientation(Qt.Vertical)
+        self.angular_vel_slider.setTickPosition(QSlider.TicksBelow)
+
+        self.horizontalLayout_11.addWidget(self.angular_vel_slider)
+
+        self.verticalLayout_9 = QVBoxLayout()
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.angular_vel_spinbox = QDoubleSpinBox(self.angular_vel_widget)
+        self.angular_vel_spinbox.setObjectName(u"angular_vel_spinbox")
+        self.angular_vel_spinbox.setDecimals(3)
+        self.angular_vel_spinbox.setMinimum(-0.400000000000000)
+        self.angular_vel_spinbox.setMaximum(0.400000000000000)
+        self.angular_vel_spinbox.setSingleStep(0.001000000000000)
+
+        self.verticalLayout_9.addWidget(self.angular_vel_spinbox)
+
+        self.angular_vel_stopbutton = QPushButton(self.angular_vel_widget)
+        self.angular_vel_stopbutton.setObjectName(u"angular_vel_stopbutton")
+
+        self.verticalLayout_9.addWidget(self.angular_vel_stopbutton)
+
+
+        self.horizontalLayout_11.addLayout(self.verticalLayout_9)
+
+
+        self.angular_velocity.addLayout(self.horizontalLayout_11)
+
+        self.verticalSpacer_12 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.angular_velocity.addItem(self.verticalSpacer_12)
+
+
+        self.horizontalLayout_4.addWidget(self.angular_vel_widget)
+
+        self.side_widget = QWidget(self.velocity_control_widget)
+        self.side_widget.setObjectName(u"side_widget")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.side_widget.sizePolicy().hasHeightForWidth())
+        self.side_widget.setSizePolicy(sizePolicy2)
+        self.side_widget.setAutoFillBackground(False)
+        self.verticalLayout_3 = QVBoxLayout(self.side_widget)
+        self.verticalLayout_3.setSpacing(4)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.battery_lvl_widget_2 = QWidget(self.side_widget)
+        self.battery_lvl_widget_2.setObjectName(u"battery_lvl_widget_2")
+        self.battery_lvl_widget_2.setAutoFillBackground(True)
+        self.battery_lvl_widget = QVBoxLayout(self.battery_lvl_widget_2)
+        self.battery_lvl_widget.setObjectName(u"battery_lvl_widget")
+        self.verticalSpacer_13 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.battery_lvl_widget.addItem(self.verticalSpacer_13)
+
+        self.label_2 = QLabel(self.battery_lvl_widget_2)
         self.label_2.setObjectName(u"label_2")
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
+        self.label_2.setMinimumSize(QSize(0, 40))
         self.label_2.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout.addWidget(self.label_2)
+        self.battery_lvl_widget.addWidget(self.label_2)
+
+        self.progressBar = QProgressBar(self.battery_lvl_widget_2)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(0)
+
+        self.battery_lvl_widget.addWidget(self.progressBar)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.battery_lvl_widget.addItem(self.verticalSpacer_4)
 
 
-        self.horizontalLayout_4.addWidget(self.widget_2)
+        self.verticalLayout_3.addWidget(self.battery_lvl_widget_2)
 
+        self.gait_type_widget_2 = QWidget(self.side_widget)
+        self.gait_type_widget_2.setObjectName(u"gait_type_widget_2")
+        self.gait_type_widget_2.setAutoFillBackground(True)
+        self.gait_type_widget = QVBoxLayout(self.gait_type_widget_2)
+        self.gait_type_widget.setObjectName(u"gait_type_widget")
+        self.verticalSpacer_14 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_2.addWidget(self.velocity_widget)
+        self.gait_type_widget.addItem(self.verticalSpacer_14)
 
-        self.widget = QWidget(self.central_widget)
-        self.widget.setObjectName(u"widget")
-        self.horizontalLayout_3 = QHBoxLayout(self.widget)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.widget_4 = QWidget(self.widget)
-        self.widget_4.setObjectName(u"widget_4")
-        self.verticalLayout_4 = QVBoxLayout(self.widget_4)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.omega_dial = QDial(self.widget_4)
-        self.omega_dial.setObjectName(u"omega_dial")
-        self.omega_dial.setMinimumSize(QSize(80, 80))
-        self.omega_dial.setMaximumSize(QSize(80, 80))
-        self.omega_dial.setMinimum(-17)
-        self.omega_dial.setMaximum(17)
-        self.omega_dial.setNotchesVisible(True)
-
-        self.verticalLayout_4.addWidget(self.omega_dial)
-
-        self.label_3 = QLabel(self.widget_4)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_4.addWidget(self.label_3)
-
-
-        self.horizontalLayout_3.addWidget(self.widget_4)
-
-        self.widget_5 = QWidget(self.widget)
-        self.widget_5.setObjectName(u"widget_5")
-        self.verticalLayout_5 = QVBoxLayout(self.widget_5)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.yaw_dial = QDial(self.widget_5)
-        self.yaw_dial.setObjectName(u"yaw_dial")
-        self.yaw_dial.setMinimumSize(QSize(80, 80))
-        self.yaw_dial.setMaximumSize(QSize(80, 80))
-        self.yaw_dial.setMinimum(-120)
-        self.yaw_dial.setMaximum(120)
-        self.yaw_dial.setSingleStep(2)
-        self.yaw_dial.setNotchesVisible(True)
-
-        self.verticalLayout_5.addWidget(self.yaw_dial)
-
-        self.yaw_label = QLabel(self.widget_5)
-        self.yaw_label.setObjectName(u"yaw_label")
-        self.yaw_label.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_5.addWidget(self.yaw_label)
-
-
-        self.horizontalLayout_3.addWidget(self.widget_5)
-
-        self.widget_6 = QWidget(self.widget)
-        self.widget_6.setObjectName(u"widget_6")
-        self.verticalLayout_6 = QVBoxLayout(self.widget_6)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.pitch_dial = QDial(self.widget_6)
-        self.pitch_dial.setObjectName(u"pitch_dial")
-        self.pitch_dial.setMinimumSize(QSize(80, 80))
-        self.pitch_dial.setMaximumSize(QSize(80, 80))
-        self.pitch_dial.setMinimum(-250)
-        self.pitch_dial.setMaximum(250)
-        self.pitch_dial.setSingleStep(4)
-        self.pitch_dial.setNotchesVisible(True)
-
-        self.verticalLayout_6.addWidget(self.pitch_dial)
-
-        self.label_4 = QLabel(self.widget_6)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_6.addWidget(self.label_4)
-
-
-        self.horizontalLayout_3.addWidget(self.widget_6)
-
-        self.widget_7 = QWidget(self.widget)
-        self.widget_7.setObjectName(u"widget_7")
-        self.verticalLayout_7 = QVBoxLayout(self.widget_7)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
-        self.roll_dial = QDial(self.widget_7)
-        self.roll_dial.setObjectName(u"roll_dial")
-        self.roll_dial.setMinimumSize(QSize(80, 80))
-        self.roll_dial.setMaximumSize(QSize(80, 80))
-        self.roll_dial.setMinimum(-120)
-        self.roll_dial.setMaximum(120)
-        self.roll_dial.setSingleStep(2)
-        self.roll_dial.setPageStep(10)
-        self.roll_dial.setNotchesVisible(True)
-
-        self.verticalLayout_7.addWidget(self.roll_dial)
-
-        self.label_5 = QLabel(self.widget_7)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_7.addWidget(self.label_5)
-
-
-        self.horizontalLayout_3.addWidget(self.widget_7)
-
-        self.widget_8 = QWidget(self.widget)
-        self.widget_8.setObjectName(u"widget_8")
-        self.verticalLayout_8 = QVBoxLayout(self.widget_8)
-        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.widget_21 = QWidget(self.widget_8)
-        self.widget_21.setObjectName(u"widget_21")
-        self.verticalLayout_14 = QVBoxLayout(self.widget_21)
-        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
-        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
-        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_11)
-
-        self.step_height_slider = QSlider(self.widget_21)
-        self.step_height_slider.setObjectName(u"step_height_slider")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.step_height_slider.sizePolicy().hasHeightForWidth())
-        self.step_height_slider.setSizePolicy(sizePolicy3)
-        self.step_height_slider.setMinimumSize(QSize(0, 15))
-        self.step_height_slider.setMaximumSize(QSize(16777215, 15))
-        self.step_height_slider.setMaximum(150)
-        self.step_height_slider.setOrientation(Qt.Horizontal)
-
-        self.verticalLayout_14.addWidget(self.step_height_slider)
-
-        self.widget_22 = QWidget(self.widget_21)
-        self.widget_22.setObjectName(u"widget_22")
-        self.horizontalLayout_12 = QHBoxLayout(self.widget_22)
-        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
-        self.label_20 = QLabel(self.widget_22)
-        self.label_20.setObjectName(u"label_20")
-
-        self.horizontalLayout_12.addWidget(self.label_20)
-
-        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_12.addItem(self.horizontalSpacer_8)
-
-        self.label_19 = QLabel(self.widget_22)
-        self.label_19.setObjectName(u"label_19")
-
-        self.horizontalLayout_12.addWidget(self.label_19)
-
-
-        self.verticalLayout_14.addWidget(self.widget_22)
-
-        self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_10)
-
-
-        self.verticalLayout_8.addWidget(self.widget_21)
-
-        self.label_6 = QLabel(self.widget_8)
-        self.label_6.setObjectName(u"label_6")
-        self.label_6.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_8.addWidget(self.label_6)
-
-
-        self.horizontalLayout_3.addWidget(self.widget_8)
-
-
-        self.verticalLayout_2.addWidget(self.widget)
-
-        self.widget_9 = QWidget(self.central_widget)
-        self.widget_9.setObjectName(u"widget_9")
-        self.horizontalLayout_5 = QHBoxLayout(self.widget_9)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.widget_10 = QWidget(self.widget_9)
-        self.widget_10.setObjectName(u"widget_10")
-        self.horizontalLayout_6 = QHBoxLayout(self.widget_10)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.label_7 = QLabel(self.widget_10)
+        self.label_7 = QLabel(self.gait_type_widget_2)
         self.label_7.setObjectName(u"label_7")
+        self.label_7.setMinimumSize(QSize(0, 40))
+        self.label_7.setAlignment(Qt.AlignCenter)
 
-        self.horizontalLayout_6.addWidget(self.label_7)
+        self.gait_type_widget.addWidget(self.label_7)
 
-        self.gait_selection = QComboBox(self.widget_10)
+        self.gait_selection = QComboBox(self.gait_type_widget_2)
         self.gait_selection.setObjectName(u"gait_selection")
 
-        self.horizontalLayout_6.addWidget(self.gait_selection)
+        self.gait_type_widget.addWidget(self.gait_selection)
+
+        self.verticalSpacer_15 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gait_type_widget.addItem(self.verticalSpacer_15)
 
 
-        self.horizontalLayout_5.addWidget(self.widget_10)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_5.addItem(self.horizontalSpacer)
-
-        self.widget_11 = QWidget(self.widget_9)
-        self.widget_11.setObjectName(u"widget_11")
-        self.horizontalLayout_7 = QHBoxLayout(self.widget_11)
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.label_8 = QLabel(self.widget_11)
-        self.label_8.setObjectName(u"label_8")
-
-        self.horizontalLayout_7.addWidget(self.label_8)
-
-        self.checkBox_1 = QCheckBox(self.widget_11)
-        self.checkBox_1.setObjectName(u"checkBox_1")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_1)
-
-        self.checkBox_2 = QCheckBox(self.widget_11)
-        self.checkBox_2.setObjectName(u"checkBox_2")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_2)
-
-        self.checkBox_3 = QCheckBox(self.widget_11)
-        self.checkBox_3.setObjectName(u"checkBox_3")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_3)
-
-        self.checkBox_4 = QCheckBox(self.widget_11)
-        self.checkBox_4.setObjectName(u"checkBox_4")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_4)
-
-        self.checkBox_5 = QCheckBox(self.widget_11)
-        self.checkBox_5.setObjectName(u"checkBox_5")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_5)
-
-        self.checkBox_6 = QCheckBox(self.widget_11)
-        self.checkBox_6.setObjectName(u"checkBox_6")
-
-        self.horizontalLayout_7.addWidget(self.checkBox_6)
+        self.verticalLayout_3.addWidget(self.gait_type_widget_2)
 
 
-        self.horizontalLayout_5.addWidget(self.widget_11)
+        self.horizontalLayout_4.addWidget(self.side_widget)
+
+        self.horizontalLayout_4.setStretch(0, 3)
+        self.horizontalLayout_4.setStretch(1, 3)
+        self.horizontalLayout_4.setStretch(2, 3)
+        self.horizontalLayout_4.setStretch(3, 1)
+
+        self.velocity_widget.addWidget(self.velocity_control_widget)
+
+        self.velocity_title = QLabel(self.verticalWidget_2)
+        self.velocity_title.setObjectName(u"velocity_title")
+        palette1 = QPalette()
+        brush2 = QBrush(QColor(229, 165, 10, 255))
+        brush2.setStyle(Qt.SolidPattern)
+        palette1.setBrush(QPalette.Active, QPalette.Base, brush2)
+        brush3 = QBrush(QColor(36, 36, 36, 255))
+        brush3.setStyle(Qt.SolidPattern)
+        palette1.setBrush(QPalette.Inactive, QPalette.Base, brush3)
+        palette1.setBrush(QPalette.Disabled, QPalette.Base, brush1)
+        self.velocity_title.setPalette(palette1)
+        self.velocity_title.setFont(font1)
+
+        self.velocity_widget.addWidget(self.velocity_title)
+
+        self.horizontalWidget_7 = QWidget(self.verticalWidget_2)
+        self.horizontalWidget_7.setObjectName(u"horizontalWidget_7")
+        palette2 = QPalette()
+        palette2.setBrush(QPalette.Active, QPalette.Window, brush)
+        palette2.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette2.setBrush(QPalette.Disabled, QPalette.Window, brush)
+        self.horizontalWidget_7.setPalette(palette2)
+        self.horizontalLayout_12 = QHBoxLayout(self.horizontalWidget_7)
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(-1, 10, -1, 10)
+        self.verticalWidget_4 = QWidget(self.horizontalWidget_7)
+        self.verticalWidget_4.setObjectName(u"verticalWidget_4")
+        self.verticalWidget_4.setAutoFillBackground(True)
+        self.verticalLayout_10 = QVBoxLayout(self.verticalWidget_4)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.label_3 = QLabel(self.verticalWidget_4)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setMinimumSize(QSize(0, 40))
+        self.label_3.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_10.addWidget(self.label_3)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_10.addItem(self.verticalSpacer)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.roll_slider = QSlider(self.verticalWidget_4)
+        self.roll_slider.setObjectName(u"roll_slider")
+        self.roll_slider.setMinimumSize(QSize(0, 180))
+        self.roll_slider.setMaximum(100)
+        self.roll_slider.setValue(50)
+        self.roll_slider.setOrientation(Qt.Vertical)
+
+        self.horizontalLayout_3.addWidget(self.roll_slider)
+
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.roll_spinbox = QDoubleSpinBox(self.verticalWidget_4)
+        self.roll_spinbox.setObjectName(u"roll_spinbox")
+        self.roll_spinbox.setDecimals(3)
+        self.roll_spinbox.setMinimum(-3.000000000000000)
+        self.roll_spinbox.setMaximum(3.000000000000000)
+        self.roll_spinbox.setSingleStep(0.001000000000000)
+
+        self.verticalLayout.addWidget(self.roll_spinbox)
+
+        self.roll_reset_button = QPushButton(self.verticalWidget_4)
+        self.roll_reset_button.setObjectName(u"roll_reset_button")
+
+        self.verticalLayout.addWidget(self.roll_reset_button)
 
 
-        self.verticalLayout_2.addWidget(self.widget_9)
+        self.horizontalLayout_3.addLayout(self.verticalLayout)
 
-        self.verticalSpacer = QSpacerItem(20, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout_2.addItem(self.verticalSpacer)
+        self.verticalLayout_10.addLayout(self.horizontalLayout_3)
+
+
+        self.horizontalLayout_12.addWidget(self.verticalWidget_4)
+
+        self.verticalWidget_5 = QWidget(self.horizontalWidget_7)
+        self.verticalWidget_5.setObjectName(u"verticalWidget_5")
+        self.verticalWidget_5.setAutoFillBackground(True)
+        self.verticalLayout_7 = QVBoxLayout(self.verticalWidget_5)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.label_4 = QLabel(self.verticalWidget_5)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setMinimumSize(QSize(0, 40))
+        self.label_4.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_7.addWidget(self.label_4)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_7.addItem(self.verticalSpacer_2)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.pitch_slider = QSlider(self.verticalWidget_5)
+        self.pitch_slider.setObjectName(u"pitch_slider")
+        self.pitch_slider.setMinimumSize(QSize(0, 180))
+        self.pitch_slider.setMaximum(100)
+        self.pitch_slider.setValue(50)
+        self.pitch_slider.setOrientation(Qt.Vertical)
+
+        self.horizontalLayout_5.addWidget(self.pitch_slider)
+
+        self.verticalLayout_8 = QVBoxLayout()
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.pitch_spinbox = QDoubleSpinBox(self.verticalWidget_5)
+        self.pitch_spinbox.setObjectName(u"pitch_spinbox")
+        self.pitch_spinbox.setDecimals(3)
+        self.pitch_spinbox.setMinimum(-6.000000000000000)
+        self.pitch_spinbox.setMaximum(6.000000000000000)
+        self.pitch_spinbox.setSingleStep(0.001000000000000)
+
+        self.verticalLayout_8.addWidget(self.pitch_spinbox)
+
+        self.pitch_reset_button = QPushButton(self.verticalWidget_5)
+        self.pitch_reset_button.setObjectName(u"pitch_reset_button")
+
+        self.verticalLayout_8.addWidget(self.pitch_reset_button)
+
+
+        self.horizontalLayout_5.addLayout(self.verticalLayout_8)
+
+
+        self.verticalLayout_7.addLayout(self.horizontalLayout_5)
+
+
+        self.horizontalLayout_12.addWidget(self.verticalWidget_5)
+
+        self.verticalWidget_21 = QWidget(self.horizontalWidget_7)
+        self.verticalWidget_21.setObjectName(u"verticalWidget_21")
+        self.verticalWidget_21.setAutoFillBackground(True)
+        self.verticalLayout_4 = QVBoxLayout(self.verticalWidget_21)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.label_5 = QLabel(self.verticalWidget_21)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setMinimumSize(QSize(0, 40))
+        self.label_5.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_4.addWidget(self.label_5)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_4.addItem(self.verticalSpacer_3)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.base_height_slider = QSlider(self.verticalWidget_21)
+        self.base_height_slider.setObjectName(u"base_height_slider")
+        self.base_height_slider.setMinimumSize(QSize(0, 180))
+        self.base_height_slider.setMinimum(0)
+        self.base_height_slider.setMaximum(100)
+        self.base_height_slider.setValue(43)
+        self.base_height_slider.setSliderPosition(43)
+        self.base_height_slider.setOrientation(Qt.Vertical)
+
+        self.horizontalLayout_6.addWidget(self.base_height_slider)
+
+        self.verticalLayout_11 = QVBoxLayout()
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.base_height_spinbox = QDoubleSpinBox(self.verticalWidget_21)
+        self.base_height_spinbox.setObjectName(u"base_height_spinbox")
+        self.base_height_spinbox.setDecimals(3)
+        self.base_height_spinbox.setMinimum(0.090000000000000)
+        self.base_height_spinbox.setMaximum(0.160000000000000)
+        self.base_height_spinbox.setSingleStep(0.001000000000000)
+        self.base_height_spinbox.setValue(0.120000000000000)
+
+        self.verticalLayout_11.addWidget(self.base_height_spinbox)
+
+        self.base_height_default_button = QPushButton(self.verticalWidget_21)
+        self.base_height_default_button.setObjectName(u"base_height_default_button")
+
+        self.verticalLayout_11.addWidget(self.base_height_default_button)
+
+
+        self.horizontalLayout_6.addLayout(self.verticalLayout_11)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_6)
+
+
+        self.horizontalLayout_12.addWidget(self.verticalWidget_21)
+
+
+        self.velocity_widget.addWidget(self.horizontalWidget_7)
+
+
+        self.verticalLayout_15.addWidget(self.verticalWidget_2)
+
+
+        self.verticalLayout_16.addLayout(self.verticalLayout_15)
+
+        self.tabWidget.addTab(self.Walk, "")
+
+        self.verticalLayout_2.addWidget(self.tabWidget)
+
+        self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_10)
 
         HexapodController.setCentralWidget(self.central_widget)
+        self.menuBar = QMenuBar(HexapodController)
+        self.menuBar.setObjectName(u"menuBar")
+        self.menuBar.setGeometry(QRect(0, 0, 900, 23))
+        self.menuHelp = QMenu(self.menuBar)
+        self.menuHelp.setObjectName(u"menuHelp")
+        HexapodController.setMenuBar(self.menuBar)
+
+        self.menuBar.addAction(self.menuHelp.menuAction())
+        self.menuHelp.addAction(self.actionAbout)
 
         self.retranslateUi(HexapodController)
 
+        self.tabWidget.setCurrentIndex(0)
         self.gait_selection.setCurrentIndex(-1)
 
 
@@ -594,34 +653,33 @@ class Ui_HexapodController(object):
     # setupUi
 
     def retranslateUi(self, HexapodController):
-        HexapodController.setWindowTitle(QCoreApplication.translate("HexapodController", u"Elkapod Controller", None))
-        self.label_14.setText(QCoreApplication.translate("HexapodController", u"0.000", None))
-        self.label_15.setText(QCoreApplication.translate("HexapodController", u"0.023", None))
-        self.label_13.setText(QCoreApplication.translate("HexapodController", u"0.046", None))
-        self.label_18.setText(QCoreApplication.translate("HexapodController", u"0.0", None))
-        self.label_17.setText(QCoreApplication.translate("HexapodController", u"0.2", None))
-        self.label_16.setText(QCoreApplication.translate("HexapodController", u"0.4", None))
-        self.label_9.setText(QCoreApplication.translate("HexapodController", u"Corpus Position", None))
-        self.label.setText(QCoreApplication.translate("HexapodController", u"v direction", None))
-        self.label_12.setText(QCoreApplication.translate("HexapodController", u"0.000m/s", None))
-        self.label_11.setText(QCoreApplication.translate("HexapodController", u"0.015m/s", None))
-        self.label_10.setText(QCoreApplication.translate("HexapodController", u"0.030m/s", None))
-        self.label_2.setText(QCoreApplication.translate("HexapodController", u"v value", None))
-        self.label_3.setText(QCoreApplication.translate("HexapodController", u"omega", None))
-        self.yaw_label.setText(QCoreApplication.translate("HexapodController", u"yaw", None))
-        self.label_4.setText(QCoreApplication.translate("HexapodController", u"pitch", None))
-        self.label_5.setText(QCoreApplication.translate("HexapodController", u"roll", None))
-        self.label_20.setText(QCoreApplication.translate("HexapodController", u"0.000", None))
-        self.label_19.setText(QCoreApplication.translate("HexapodController", u"0.015", None))
-        self.label_6.setText(QCoreApplication.translate("HexapodController", u"step height", None))
+        HexapodController.setWindowTitle(QCoreApplication.translate("HexapodController", u"Elkapod Control ", None))
+        self.actionAbout.setText(QCoreApplication.translate("HexapodController", u"About", None))
+        self.transition_status_title.setText(QCoreApplication.translate("HexapodController", u"Transition status:", None))
+        self.transition_status_label.setText(QCoreApplication.translate("HexapodController", u"none", None))
+        self.init_transition_button.setText(QCoreApplication.translate("HexapodController", u"Init", None))
+        self.idle_transition_button.setText(QCoreApplication.translate("HexapodController", u"Idle", None))
+        self.walk_transition_button.setText(QCoreApplication.translate("HexapodController", u"Walk", None))
+        self.label_6.setText(QCoreApplication.translate("HexapodController", u"Speed up Gazebo with your mouse ->", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Init), QCoreApplication.translate("HexapodController", u"Init", None))
+        self.label_8.setText(QCoreApplication.translate("HexapodController", u"Walk control", None))
+        self.velocity_dir_title.setText(QCoreApplication.translate("HexapodController", u"Linear velocity direction", None))
+        self.label.setText(QCoreApplication.translate("HexapodController", u"Angle (rad)", None))
+        self.velocity_value_title.setText(QCoreApplication.translate("HexapodController", u"Linear velocity value", None))
+        self.vval_stop_button.setText(QCoreApplication.translate("HexapodController", u"Stop", None))
+        self.angular_vel_title.setText(QCoreApplication.translate("HexapodController", u"Angular velocity", None))
+        self.angular_vel_stopbutton.setText(QCoreApplication.translate("HexapodController", u"Stop", None))
+        self.label_2.setText(QCoreApplication.translate("HexapodController", u"Battery level", None))
         self.label_7.setText(QCoreApplication.translate("HexapodController", u"Gait", None))
         self.gait_selection.setCurrentText("")
-        self.label_8.setText(QCoreApplication.translate("HexapodController", u"Supportive legs", None))
-        self.checkBox_1.setText(QCoreApplication.translate("HexapodController", u"1", None))
-        self.checkBox_2.setText(QCoreApplication.translate("HexapodController", u"2", None))
-        self.checkBox_3.setText(QCoreApplication.translate("HexapodController", u"3", None))
-        self.checkBox_4.setText(QCoreApplication.translate("HexapodController", u"4", None))
-        self.checkBox_5.setText(QCoreApplication.translate("HexapodController", u"5", None))
-        self.checkBox_6.setText(QCoreApplication.translate("HexapodController", u"6", None))
+        self.velocity_title.setText(QCoreApplication.translate("HexapodController", u"Body control", None))
+        self.label_3.setText(QCoreApplication.translate("HexapodController", u"Roll control", None))
+        self.roll_reset_button.setText(QCoreApplication.translate("HexapodController", u"Reset", None))
+        self.label_4.setText(QCoreApplication.translate("HexapodController", u"Pitch control", None))
+        self.pitch_reset_button.setText(QCoreApplication.translate("HexapodController", u"Reset", None))
+        self.label_5.setText(QCoreApplication.translate("HexapodController", u"Base height", None))
+        self.base_height_default_button.setText(QCoreApplication.translate("HexapodController", u"Default", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Walk), QCoreApplication.translate("HexapodController", u"Walk", None))
+        self.menuHelp.setTitle(QCoreApplication.translate("HexapodController", u"Help", None))
     # retranslateUi
 

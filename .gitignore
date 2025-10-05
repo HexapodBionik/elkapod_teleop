@@ -1,3 +1,4 @@
 .idea/
-elkapod_msgs/
-.vscode
+__pycache__/
+.ruff_cache/
+.vscode/
