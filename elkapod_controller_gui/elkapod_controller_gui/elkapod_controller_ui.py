@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'elkapod_controller2ioQTpw.ui'
+## Form generated from reading UI file 'elkapod_controller2RTxmwx.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.4.2
 ##
@@ -102,33 +102,6 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_14.addItem(self.verticalSpacer_11)
 
-        self.horizontalLayout_14 = QHBoxLayout()
-        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_14.addItem(self.horizontalSpacer_2)
-
-        self.label_6 = QLabel(self.Init)
-        self.label_6.setObjectName(u"label_6")
-        font = QFont()
-        font.setPointSize(20)
-        font.setBold(True)
-        self.label_6.setFont(font)
-
-        self.horizontalLayout_14.addWidget(self.label_6)
-
-        self.dial = QDial(self.Init)
-        self.dial.setObjectName(u"dial")
-
-        self.horizontalLayout_14.addWidget(self.dial)
-
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_14.addItem(self.horizontalSpacer_3)
-
-
-        self.verticalLayout_14.addLayout(self.horizontalLayout_14)
-
         self.tabWidget.addTab(self.Init, "")
         self.Walk = QWidget()
         self.Walk.setObjectName(u"Walk")
@@ -153,9 +126,9 @@ class Ui_HexapodController(object):
         self.velocity_widget.setContentsMargins(-1, 10, -1, 10)
         self.label_8 = QLabel(self.verticalWidget_2)
         self.label_8.setObjectName(u"label_8")
-        font1 = QFont()
-        font1.setPointSize(18)
-        self.label_8.setFont(font1)
+        font = QFont()
+        font.setPointSize(18)
+        self.label_8.setFont(font)
         self.label_8.setFrameShape(QFrame.NoFrame)
         self.label_8.setTextFormat(Qt.AutoText)
 
@@ -271,7 +244,7 @@ class Ui_HexapodController(object):
         self.vval_spinbox = QDoubleSpinBox(self.vval_widget)
         self.vval_spinbox.setObjectName(u"vval_spinbox")
         self.vval_spinbox.setDecimals(3)
-        self.vval_spinbox.setMaximum(0.300000000000000)
+        self.vval_spinbox.setMaximum(0.200000000000000)
         self.vval_spinbox.setSingleStep(0.001000000000000)
 
         self.verticalLayout_13.addWidget(self.vval_spinbox)
@@ -442,7 +415,7 @@ class Ui_HexapodController(object):
         palette1.setBrush(QPalette.Inactive, QPalette.Base, brush3)
         palette1.setBrush(QPalette.Disabled, QPalette.Base, brush1)
         self.velocity_title.setPalette(palette1)
-        self.velocity_title.setFont(font1)
+        self.velocity_title.setFont(font)
 
         self.velocity_widget.addWidget(self.velocity_title)
 
@@ -636,12 +609,12 @@ class Ui_HexapodController(object):
         self.menuBar = QMenuBar(HexapodController)
         self.menuBar.setObjectName(u"menuBar")
         self.menuBar.setGeometry(QRect(0, 0, 900, 23))
-        self.menuHelp = QMenu(self.menuBar)
-        self.menuHelp.setObjectName(u"menuHelp")
+        self.menuAbout = QMenu(self.menuBar)
+        self.menuAbout.setObjectName(u"menuAbout")
         HexapodController.setMenuBar(self.menuBar)
 
-        self.menuBar.addAction(self.menuHelp.menuAction())
-        self.menuHelp.addAction(self.actionAbout)
+        self.menuBar.addAction(self.menuAbout.menuAction())
+        self.menuAbout.addAction(self.actionAbout)
 
         self.retranslateUi(HexapodController)
 
@@ -660,7 +633,6 @@ class Ui_HexapodController(object):
         self.init_transition_button.setText(QCoreApplication.translate("HexapodController", u"Init", None))
         self.idle_transition_button.setText(QCoreApplication.translate("HexapodController", u"Idle", None))
         self.walk_transition_button.setText(QCoreApplication.translate("HexapodController", u"Walk", None))
-        self.label_6.setText(QCoreApplication.translate("HexapodController", u"Speed up Gazebo with your mouse ->", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Init), QCoreApplication.translate("HexapodController", u"Init", None))
         self.label_8.setText(QCoreApplication.translate("HexapodController", u"Walk control", None))
         self.velocity_dir_title.setText(QCoreApplication.translate("HexapodController", u"Linear velocity direction", None))
@@ -680,6 +652,6 @@ class Ui_HexapodController(object):
         self.label_5.setText(QCoreApplication.translate("HexapodController", u"Base height", None))
         self.base_height_default_button.setText(QCoreApplication.translate("HexapodController", u"Default", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Walk), QCoreApplication.translate("HexapodController", u"Walk", None))
-        self.menuHelp.setTitle(QCoreApplication.translate("HexapodController", u"Help", None))
+        self.menuAbout.setTitle(QCoreApplication.translate("HexapodController", u"Help", None))
     # retranslateUi
 
