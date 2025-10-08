@@ -20,6 +20,8 @@ def generate_launch_description():
         Node(
             package='elkapod_teleop_joy',
             executable='elkapod_joy_controller',
+            output='screen',
+            emulate_tty=True
         )
     )
 

@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from elkapod_msgs.msg import TrajectoryParameters
+from elkapod_teleop.elkapod_teleop_joy.elkapod_teleop_joy.elkapod_joy_controller_v2 import ElkapodControllerNode
 import math
 import numpy as np
 from enum import Enum
@@ -21,22 +22,6 @@ class ElkapodJoyController(Node):
         super().__init__(node_name="elkapod_joy_controller")
 
         self._joy_subscriber = self.create_subscription(Joy, "/joy", self._new_position_callback, 10)
-        self._leg_publisher = self.create_publisher(TrajectoryParameters, "/elkapod_trajectory_parameters", 10)
-
-        self._trajectory_parameters = TrajectoryParameters()
-        self._trajectory_parameters.leg_spacing = 0.6
-        self._trajectory_parameters.height = 0.07
-        self._trajectory_parameters.vdir = math.pi / 2
-        self._trajectory_parameters.vval = 0.
-        self._trajectory_parameters.omega = 0.
-        self._trajectory_parameters.yaw = 0.
-        self._trajectory_parameters.pitch = 0.
-        self._trajectory_parameters.roll = 0.
-        self._trajectory_parameters.step_height = 0.1
-        self._trajectory_parameters.corpus_position = [0., 0.]
-        self._trajectory_parameters.cycle_time = 6.
-        self._trajectory_parameters.supportive_legs = [True for _ in range(6)]
-        self._trajectory_parameters.gait = "3POINT"
 
         self._vel_max = 0.02
         self._vel_min = 0.0

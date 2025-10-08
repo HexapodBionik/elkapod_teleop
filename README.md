@@ -1,7 +1,7 @@
 # Elkapod teleoperation repository
-![ROS2 distro](https://img.shields.io/badge/ros--version-humble-blue)
+![ROS2 distro](https://img.shields.io/badge/ros--version-jazzy-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Python Version](https://img.shields.io/badge/python-3.10-g.svg)
+![Python Version](https://img.shields.io/badge/python-3.12-g.svg)
 
 ## Installation
 1. Create a workspace and clone packages into it
@@ -35,40 +35,18 @@ Run the ROS2 node:
 ros2 run elkapod_controller_gui elkapod_controller_gui
 ```
 **Elkapod Control Panel Layout**  
-![binding](doc/images/elkapod_gui_overwiev.png)
+![binding](doc/images/elkapod_gui_overview.png)
 
-- First slider controls the width of the leg spacing
-- Second slider controls the height of the corpus
-- `Corpus Position` controls 
-- `v direction` - the direction of move, relative to Elkapod head
-- `v value` - linear velocity of moving
-- `omega` - angular velocity of moving
-- `yaw` - roll
-- `pitch` - pitch
-- `roll` - yaw
-- `step height` - lift height of leg. If set to 0, Elkapod will crawl without lifting legs
-- `gait` - chooses the type of movement. Supported types:
-    - 3POINT - 3 legs moving and 3 transferring corpus at time
-    - RIPPLE - 
-    - MECHATRONICS - one leg moving at time
-    - STAND - legs in the base position
-- `supportive legs` - choose legs to lift and turn them off
+1. **Init** window controls transition between robot states. After startup robot has to be initialized with **Init** button.
+2. In next step robot has to stand up and for this task you should use **Idle** button. 
+3. Finally in order to activate the controller use **Walk button**. 
+
+![binding](doc/images/elkapod_gui_overview_2.png)
+
 
 ## Elkapod Control using joystick controller
 > [!IMPORTANT] 
 >
-> Currently only Xbox controllers are supported
+> In development
 >
-
-Launch the ROS2 nodes:
-```bash
-ros2 launch elkapod_teleop_joy elkapod_joy_controller.launch.py
-```
-
-**Current key & axes binding**  
-![binding](doc/images/elkapod_joy_controller_latest.png)
-
-### Credits
-Xbox® and Xbox Series X® Controller are registered trademarks of Microsoft Corporation.
-
-Binding template created by Goldwolf & Shoadow.
+>

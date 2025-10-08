@@ -244,12 +244,18 @@ class ApplicationMainWindow(QMainWindow):
         match gait:
             case "TRIPOD":
                 gait_cmd = GaitType.TRIPOD
+                self._current_max_speed = 0.2
             case "WAVE":
                 gait_cmd = GaitType.WAVE
+                self._current_max_speed = 0.05
             case "RIPPLE":
                 gait_cmd = GaitType.RIPPLE
+                self._current_max_speed = 0.15
             case _:
                 gait_cmd = GaitType.TRIPOD
+        self._ui.vval_spinbox.setMaximum(self._current_max_speed)
+        vval_clamped = min(self._current_max_speed, self._speed.norm())
+        self._update_vval(vval_clamped)
         self.node.send_gait_type_command(gait_cmd)
 
     def _show_about_message(self):
