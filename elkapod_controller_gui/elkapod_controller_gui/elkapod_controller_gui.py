@@ -6,8 +6,9 @@ from PySide6.QtWidgets import (
 import math
 
 from .elkapod_controller_ui import Ui_HexapodController
-from .elkapod_gui_node import SpeedCommand, GaitType
+from .elkapod_gui_node import SpeedCommand, GaitType, ElkapodControllerGui
 from enum import Enum
+
 
 class RobotState(Enum):
     START = 0
@@ -15,11 +16,13 @@ class RobotState(Enum):
     IDLE = 2
     WALKING = 3
 
+
 class ApplicationMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._ui = Ui_HexapodController()
         self._ui.setupUi(self)
+        self.node: ElkapodControllerGui = None
 
     def setup(self):
         self._ui.vdir_dial.sliderMoved.connect(self._update_vdir_dial)
@@ -92,7 +95,7 @@ class ApplicationMainWindow(QMainWindow):
         self._send_angular_vel_command(0.0)
 
     def _update_roll_slider(self, roll: str):
-        roll_deg = -3.0 + (float(roll) / 100.)*6.
+        roll_deg = -3.0 + (float(roll) / 100.) * 6.
         roll_rad = roll_deg * math.pi / 180.
         self._ui.roll_spinbox.setValue(roll_deg)
         self.node.send_roll_command(roll_rad)
@@ -110,11 +113,11 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_roll_command(0.0)
 
     def _update_pitch_slider(self, pitch: str):
-        pitch_deg = -6.0 + (float(pitch) / 100.)*12.
+        pitch_deg = -6.0 + (float(pitch) / 100.) * 12.
         pitch_rad = pitch_deg * math.pi / 180.
         self._ui.pitch_spinbox.setValue(pitch_deg)
         self.node.send_pitch_command(pitch_rad)
-    
+
     def _update_pitch_spinbox(self, pitch: str):
         pitch_deg = float(pitch)
         pitch_rad = pitch_deg * math.pi / 180.
@@ -128,7 +131,7 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_pitch_command(0.0)
 
     def _update_base_height_slider(self, height: str):
-        base_height = 0.09 + (float(height) / 100.)*0.07
+        base_height = 0.09 + (float(height) / 100.) * 0.07
         self._ui.base_height_spinbox.setValue(base_height)
         self.node.send_base_height_command(base_height)
 
@@ -156,7 +159,7 @@ class ApplicationMainWindow(QMainWindow):
     def _send_walk_transition(self):
         self._ui.transition_status_label.setText("started")
         self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
-    
+
         self.node.send_walk_enable_cmd()
         self._next_state = RobotState.WALKING
 
@@ -217,7 +220,7 @@ class ApplicationMainWindow(QMainWindow):
         vdir = 0.0
         if self._speed.norm() > 0.0:
             vdir = math.atan2(self._speed.vy, self._speed.vx)
-        
+
         self._speed.vx = math.cos(vdir) * vval
         self._speed.vy = math.sin(vdir) * vval
         self.node.send_vel_command(self._speed)
