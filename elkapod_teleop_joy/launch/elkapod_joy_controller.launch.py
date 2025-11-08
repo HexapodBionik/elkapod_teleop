@@ -1,8 +1,8 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python import get_package_share_directory
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 import os
 
 
@@ -12,21 +12,38 @@ def generate_launch_description():
     elkapod_motion_manager_dir = get_package_share_directory('elkapod_motion_manager')
     config_path = os.path.join(elkapod_motion_manager_dir, 'config', 'elkapod_motion_manager.yaml')
 
-    teleop_twist_joy_pkg_prefix = get_package_share_directory('teleop_twist_joy')
-    teleop_twist_joy_handler_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [teleop_twist_joy_pkg_prefix, '/launch/teleop-launch.py']),
-        launch_arguments={"joy_config": "xbox"}.items(),
+    joy_dev = LaunchConfiguration('joy_dev')
+    gamepad_model = LaunchConfiguration('gamepad_model')
+
+    ld.add_action(
+        DeclareLaunchArgument('joy_dev', default_value='0')
     )
-    ld.add_action(teleop_twist_joy_handler_launch)
+
+    ld.add_action(
+        DeclareLaunchArgument('gamepad_model', default_value='xbox-series-x')
+    )
+
+    ld.add_action(
+        Node(
+            package='joy',
+            executable='joy_node',
+            name='joy_node',
+            parameters=[{
+                'device_id': joy_dev,
+                'deadzone': 0.3,
+                'autorepeat_rate': 20.0,
+            }]),
+
+    )
 
     ld.add_action(
         Node(
             package='elkapod_teleop_joy',
             executable='joy_controller',
-            parameters=[config_path],
+            parameters=[config_path, {"gamepad_model": gamepad_model}],
             output='screen',
             emulate_tty=True
+            
         )
     )
 

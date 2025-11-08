@@ -44,9 +44,23 @@ ros2 run elkapod_controller_gui elkapod_controller_gui
 ![binding](doc/images/elkapod_gui_overview_2.png)
 
 
-## Elkapod Control using joystick controller
-> [!IMPORTANT] 
->
-> In development
->
->
+## Elkapod Control using gamepad
+### Supported gamepad models
+- `Xbox Series X gamepad` (default)
+- `Logitech F710`
+
+### Launch
+1. Xbox Series X
+```bash
+ros2 launch elkapod_teleop_joy elkapod_joy_controller.launch.py gamepad_model:='xbox-series-x'
+```
+2. Logitech F710
+```bash
+ros2 launch elkapod_teleop_joy elkapod_joy_controller.launch.py gamepad_model:='logitech-f710'
+```
+
+### Current key & axes binding
+![binding](doc/images/elkapod_joy_controller_latest.png)
+
+### Credits
+Binding template created by Goldwolf & Shoadow.

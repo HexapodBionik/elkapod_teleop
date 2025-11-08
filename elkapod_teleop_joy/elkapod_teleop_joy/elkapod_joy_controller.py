@@ -39,6 +39,7 @@ class ElkapodJoyNode(Node):
         self.declare_parameter("max_angular_vel.tripod", None, ParameterDescriptor(description="Max angular velocity for tripod gait", dynamic_typing=True))
         self.declare_parameter("max_angular_vel.wave", None, ParameterDescriptor(description="Max angular velocity for wave gait", dynamic_typing=True))
         self.declare_parameter("max_angular_vel.ripple", None, ParameterDescriptor(description="Max angular velocity for ripple gait", dynamic_typing=True))
+        self.declare_parameter("gamepad_model", "xbox-series-x", ParameterDescriptor(description="Model of gamepad use for control", dynamic_typing=True))
 
         self._joy_subscriber = self.create_subscription(Joy, "/joy", self._joystick_callback, 10)
         self._command_timer = self.create_timer(0.05, self._send_commands_callback)
@@ -60,7 +61,12 @@ class ElkapodJoyNode(Node):
         self._max_angular_vel_tripod = self.get_parameter("max_angular_vel.tripod").get_parameter_value().double_value
         self._max_angular_vel_wave = self.get_parameter("max_angular_vel.wave").get_parameter_value().double_value
         self._max_angular_vel_ripple = self.get_parameter("max_angular_vel.ripple").get_parameter_value().double_value
+        self._gamepad_model = self.get_parameter("gamepad_model").get_parameter_value().string_value
 
+        self._supported_gamepad_models = ["xbox-series-x", "logitech-f710"]
+
+        if self._gamepad_model not in self._supported_gamepad_models:
+            raise ValueError(f"Declared gamepad model is not supported! Supported models: {self._supported_gamepad_models}")
 
         self._base_height = self._base_height_default
         self._speed = SpeedCommand()
@@ -70,6 +76,8 @@ class ElkapodJoyNode(Node):
 
         self._max_angular_speed = self._max_angular_vel_tripod
         self._max_linear_speed = self._max_vel_tripod
+
+        self._change_walk_pressed = False
 
     def _send_commands_callback(self):
         pass
@@ -115,23 +123,40 @@ class ElkapodJoyNode(Node):
         axes = msg.axes.tolist()
         buttons = msg.buttons.tolist()
 
-        pitch_axis = axes[3]
-        roll_axis = axes[2]
-        pitch_roll_reset_btn = buttons[14]
-        base_height_increment_btn = buttons[4]
-        base_height_decrement_btn = buttons[0]
-        change_walk_mode_btn = buttons[3]
+        if self._gamepad_model == "xbox-series-x":
+            vlin_axis1 = axes[0]
+            vlin_axis2 = axes[1]
+            angular_cw_axis = axes[5]
+            angular_ccw_axis = axes[4]
+            pitch_axis = axes[3]
+            roll_axis = axes[2]
+            pitch_roll_reset_btn = buttons[14]
+            base_height_increment_btn = buttons[4]
+            base_height_decrement_btn = buttons[0]
+            change_walk_mode_btn = buttons[3]
+        elif self._gamepad_model == "logitech-f710":
+            vlin_axis1 = axes[0]
+            vlin_axis2 = axes[1]
+            angular_cw_axis = axes[2]
+            angular_ccw_axis = axes[5]
+            pitch_axis = axes[4]
+            roll_axis = axes[3]
+            pitch_roll_reset_btn = buttons[10]
+            base_height_increment_btn = buttons[3]
+            base_height_decrement_btn = buttons[0]
+            change_walk_mode_btn = buttons[2]
+
 
         # Linear velocity value and direction
-        vval = np.sqrt(np.power(-axes[0], 2) + np.power(axes[1], 2))
-        vdir = np.arctan2(axes[0], axes[1])
+        vval = np.sqrt(np.power(-vlin_axis1, 2) + np.power(vlin_axis2, 2))
+        vdir = np.arctan2(vlin_axis1, vlin_axis2)
 
         self._speed.vx = math.cos(vdir) * vval
         self._speed.vy = math.sin(vdir) * vval
 
 
-        angular_clockwise_trigger = (1 - round(max(0.001, axes[5]), 2))
-        angular_anticlockwise_trigger = (1 - round(max(0.001, axes[4]), 2))
+        angular_clockwise_trigger = (1 - round(max(0.001, angular_cw_axis), 2))
+        angular_anticlockwise_trigger = (1 - round(max(0.001, angular_ccw_axis), 2))
 
         if angular_clockwise_trigger > 0.0:
             self._speed.omega = 0.5*pow(angular_clockwise_trigger, 3) * self._max_angular_speed
@@ -166,21 +191,28 @@ class ElkapodJoyNode(Node):
             self.send_pitch_command(self._pitch)
             self.send_roll_command(self._roll)
 
-        if change_walk_mode_btn and self._speed.norm() == 0.0:
+        if change_walk_mode_btn and self._speed.norm() == 0.0 and not self._change_walk_pressed:
+            self._change_walk_pressed = True
             match self._gait_type:
                 case GaitType.WAVE:
                     self._gait_type = GaitType.RIPPLE
                     self._max_angular_speed = self._max_angular_vel_ripple
                     self._max_linear_speed = self._max_angular_vel_ripple
+                    self.get_logger().info("Changed WALK to RIPPLE")
                 case GaitType.RIPPLE:
                     self._gait_type = GaitType.TRIPOD
                     self._max_angular_speed = self._max_angular_vel_tripod
                     self._max_linear_speed = self._max_angular_vel_tripod
+                    self.get_logger().info("Changed WALK to TRIPOD")
                 case GaitType.TRIPOD:
                     self._gait_type = GaitType.WAVE
                     self._max_angular_speed = self._max_angular_vel_wave
                     self._max_linear_speed = self._max_angular_vel_wave
+                    self.get_logger().info("Changed WALK to WAVE")
             self.send_gait_type_command(self._gait_type)
+        
+        if not change_walk_mode_btn and self._change_walk_pressed:
+            self._change_walk_pressed = False
 
         self.send_vel_command(self._speed)
         self.send_base_height_command(self._base_height)
