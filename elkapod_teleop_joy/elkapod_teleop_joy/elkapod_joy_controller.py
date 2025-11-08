@@ -1,192 +1,198 @@
+from enum import Enum
 import rclpy
-from rclpy.node import Node
+from rclpy.node import Node, ParameterDescriptor
+from rclpy.executors import MultiThreadedExecutor
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64, Int32
 from sensor_msgs.msg import Joy
-from elkapod_msgs.msg import TrajectoryParameters
-from elkapod_teleop.elkapod_teleop_joy.elkapod_teleop_joy.elkapod_joy_controller_v2 import ElkapodControllerNode
 import math
 import numpy as np
-from enum import Enum
 
+class GaitType(Enum):
+    WAVE = 0
+    RIPPLE = 1
+    TRIPOD = 2
 
-class Mode(Enum):
-    HEIGHT = 0
-    BASE_ORIENTATION = 1
+class SpeedCommand:
+    def __init__(self):
+        self.vx = 0
+        self.vy = 0
+        self.omega = 0
 
+    def norm(self):
+        return math.sqrt(self.vx**2 + self.vy**2)
 
-class ElkapodJoyController(Node):
+class ElkapodJoyNode(Node):
     _ROLL_PITCH_STEP = 0.005
     _BASE_HEIGHT_STEP = 0.001
-    _WALK_MODES = ["3POINT", "MECHATRONIC"]
 
     def __init__(self):
-        super().__init__(node_name="elkapod_joy_controller")
+        super().__init__("elkapod_joy")
+        self.declare_parameter("base_height.min", None, ParameterDescriptor(description="Min base height", dynamic_typing=True))
+        self.declare_parameter("base_height.max", None, ParameterDescriptor(description="Max base height", dynamic_typing=True))
+        self.declare_parameter("base_height.default",None, ParameterDescriptor(description="Default base height", dynamic_typing=True))
+        self.declare_parameter("roll.max_rad", None, ParameterDescriptor(description="Max roll value in rad", dynamic_typing=True))
+        self.declare_parameter("pitch.max_rad", None, ParameterDescriptor(description="Max pitch value in rad", dynamic_typing=True))
+        self.declare_parameter("max_vel.tripod", None, ParameterDescriptor(description="Max linear velocity for tripod gait", dynamic_typing=True))
+        self.declare_parameter("max_vel.wave", None, ParameterDescriptor(description="Max linear velocity for wave gait", dynamic_typing=True))
+        self.declare_parameter("max_vel.ripple", None, ParameterDescriptor(description="Max linear velocity for ripple gait", dynamic_typing=True))
+        self.declare_parameter("max_angular_vel.tripod", None, ParameterDescriptor(description="Max angular velocity for tripod gait", dynamic_typing=True))
+        self.declare_parameter("max_angular_vel.wave", None, ParameterDescriptor(description="Max angular velocity for wave gait", dynamic_typing=True))
+        self.declare_parameter("max_angular_vel.ripple", None, ParameterDescriptor(description="Max angular velocity for ripple gait", dynamic_typing=True))
 
-        self._joy_subscriber = self.create_subscription(Joy, "/joy", self._new_position_callback, 10)
+        self._joy_subscriber = self.create_subscription(Joy, "/joy", self._joystick_callback, 10)
+        self._command_timer = self.create_timer(0.05, self._send_commands_callback)
 
-        self._vel_max = 0.02
-        self._vel_min = 0.0
-        self._vel = 0.025
+        self._cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
+        self._cmd_gait_type_publisher = self.create_publisher(Int32, "/cmd_gait_type", 10)
+        self._cmd_base_height_publisher = self.create_publisher(Float64, "/cmd_base_height", 10)
+        self._cmd_pitch_publisher = self.create_publisher(Float64, "/pitch_setpoint", 10)
+        self._cmd_roll_publisher = self.create_publisher(Float64, "/roll_setpoint", 10)
 
-        self._min_height = 0.075
-        self._max_height = 0.15
-
-        self._euler_max = 0.15
-        self._euler_min = -0.15
-
-        self._mode = Mode.HEIGHT
-        self._clicked = False
-        self._walk_mode = 0
-        self._walk_mode_string = "3POINT"
-
-        self.get_logger().info("Elkapod Teleop Joy Controller started successfully!")
-
-    def _position_callback(self, msg: Joy):
-        step = 0.001
-
-        axes = msg.axes.tolist()
-        buttons = msg.buttons.tolist()
-
-        self._trajectory_parameters.vval = self._vel * (1-round(max(0.001, axes[4]), 2))
-        self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[5]), 2))
-
-        if self._trajectory_parameters.vval > self._vel_max:
-            self._trajectory_parameters.vval = self._vel_max
-
-        if self._trajectory_parameters.vval < self._vel_min:
-            self._trajectory_parameters.vval = self._vel_min
-
-        if self._trajectory_parameters.vval <= 1e-4 and self._trajectory_parameters.omega <= 1e-4:
-            self._trajectory_parameters.gait = "STAND"
-        else:
-            self._trajectory_parameters.gait = "3POINT"
-
-        # Change mode
-        if self._mode == Mode.HEIGHT and buttons[15] and not self._clicked:
-            self._mode = Mode.BASE_ORIENTATION
-            self._clicked = True
-        elif self._mode == Mode.BASE_ORIENTATION and buttons[15] and not self._clicked:
-            self._mode = Mode.HEIGHT
-            self._clicked = True
-        else:
-            self._clicked = False
-
-        # Height
-        if self._mode == Mode.HEIGHT:
-            self._trajectory_parameters.height += step * axes[7]
-            if self._trajectory_parameters.height >= self._max_height:
-                self._trajectory_parameters.height = self._max_height
-            elif self._trajectory_parameters.height <= self._min_height:
-                self._trajectory_parameters.height = self._min_height
-
-        elif self._mode == Mode.BASE_ORIENTATION:
-            self._trajectory_parameters.pitch += step * axes[7]
-            self._trajectory_parameters.yaw += step * axes[6]
-
-            if self._trajectory_parameters.pitch >= self._euler_max:
-                self._trajectory_parameters.pitch = self._euler_max
-            elif self._trajectory_parameters.pitch <= self._euler_min:
-                self._trajectory_parameters.pitch = self._euler_min
-
-            if self._trajectory_parameters.yaw >= self._euler_max:
-                self._trajectory_parameters.yaw = self._euler_max
-            elif self._trajectory_parameters.yaw <= self._euler_min:
-                self._trajectory_parameters.yaw = self._euler_min
-
-            if buttons[13]:
-                self._trajectory_parameters.pitch = 0.0
-                self._trajectory_parameters.yaw = 0.0
-
-        if axes[0] == 0 and axes[1] == 0:
-            self._trajectory_parameters.vdir = math.pi/2
-        else:
-            self._trajectory_parameters.vdir = np.arctan2(axes[1], -axes[0])
+        self._base_height_min = self.get_parameter("base_height.min").get_parameter_value().double_value
+        self._base_height_max = self.get_parameter("base_height.max").get_parameter_value().double_value
+        self._base_height_default = self.get_parameter("base_height.default").get_parameter_value().double_value
+        self._roll_max_rad = self.get_parameter("roll.max_rad").get_parameter_value().double_value
+        self._pitch_max_rad = self.get_parameter("pitch.max_rad").get_parameter_value().double_value
+        self._max_vel_tripod = self.get_parameter("max_vel.tripod").get_parameter_value().double_value
+        self._max_vel_wave = self.get_parameter("max_vel.wave").get_parameter_value().double_value
+        self._max_vel_ripple = self.get_parameter("max_vel.ripple").get_parameter_value().double_value
+        self._max_angular_vel_tripod = self.get_parameter("max_angular_vel.tripod").get_parameter_value().double_value
+        self._max_angular_vel_wave = self.get_parameter("max_angular_vel.wave").get_parameter_value().double_value
+        self._max_angular_vel_ripple = self.get_parameter("max_angular_vel.ripple").get_parameter_value().double_value
 
 
-        # Roll
+        self._base_height = self._base_height_default
+        self._speed = SpeedCommand()
+        self._roll = 0.0
+        self._pitch = 0.0
+        self._gait_type = GaitType.TRIPOD
 
-        self._leg_publisher.publish(self._trajectory_parameters)
+        self._max_angular_speed = self._max_angular_vel_tripod
+        self._max_linear_speed = self._max_vel_tripod
 
-    def _new_position_callback(self, msg: Joy):
+    def _send_commands_callback(self):
+        pass
+
+    def send_gait_type_command(self, gait_type: GaitType):
+        msg = Int32()
+        match gait_type:
+            case GaitType.WAVE:
+                msg.data = 0
+            case GaitType.RIPPLE:
+                msg.data = 1
+            case GaitType.TRIPOD:
+                msg.data = 2
+            case _:
+                msg.data = 2
+        self._cmd_gait_type_publisher.publish(msg)
+
+    def send_base_height_command(self, base_height: float):
+        msg = Float64()
+        msg.data = base_height
+        self._cmd_base_height_publisher.publish(msg)
+
+    def send_vel_command(self, speed_command: SpeedCommand):
+        msg = Twist()
+        msg.linear.x = float(speed_command.vx)
+        msg.linear.y = float(speed_command.vy)
+        msg.angular.z = float(speed_command.omega)
+
+        self._cmd_vel_publisher.publish(msg)
+
+    def send_pitch_command(self, pitch: float):
+        msg = Float64()
+        msg.data = pitch
+        self._cmd_pitch_publisher.publish(msg)
+
+    def send_roll_command(self, roll: float):
+        msg = Float64()
+        msg.data = roll
+        self._cmd_roll_publisher.publish(msg)
+
+    def _joystick_callback(self, msg: Joy):
         # Get axes and positions
         axes = msg.axes.tolist()
         buttons = msg.buttons.tolist()
 
-        # Set current walk type
-        self._trajectory_parameters.gait = self._walk_mode_string
+        pitch_axis = axes[3]
+        roll_axis = axes[2]
+        pitch_roll_reset_btn = buttons[14]
+        base_height_increment_btn = buttons[4]
+        base_height_decrement_btn = buttons[0]
+        change_walk_mode_btn = buttons[3]
 
         # Linear velocity value and direction
-        v_lin_percentage = np.sqrt(np.power(-axes[0], 2) + np.power(axes[1], 2))
-        v_lin_dir = np.arctan2(axes[1], -axes[0])
-        self._trajectory_parameters.vval = v_lin_percentage * self._vel_max
-        self._trajectory_parameters.vdir = v_lin_dir
+        vval = np.sqrt(np.power(-axes[0], 2) + np.power(axes[1], 2))
+        vdir = np.arctan2(axes[0], axes[1])
 
-        # Angular velocity
-        if (1 - round(max(0.001, axes[5]))):
-            self._trajectory_parameters.omega = self._vel * (1 - round(max(0.001, axes[5]), 2))
-            self._trajectory_parameters.step_height = 0.02
-        elif (1 - round(max(0.001, axes[4]))):
-            self._trajectory_parameters.omega = -self._vel * (1 - round(max(0.001, axes[4]), 2))
-        else:
-            self._trajectory_parameters.omega = 0.0
-            self._trajectory_parameters.step_height = 0.07
+        self._speed.vx = math.cos(vdir) * vval
+        self._speed.vy = math.sin(vdir) * vval
 
-        # Roll and Pitch control
-        self._trajectory_parameters.pitch += self._ROLL_PITCH_STEP * axes[3]
-        self._trajectory_parameters.yaw -= self._ROLL_PITCH_STEP * axes[2]
 
-        if self._trajectory_parameters.pitch >= self._euler_max:
-            self._trajectory_parameters.pitch = self._euler_max
-        elif self._trajectory_parameters.pitch <= self._euler_min:
-            self._trajectory_parameters.pitch = self._euler_min
+        angular_clockwise_trigger = (1 - round(max(0.001, axes[5]), 2))
+        angular_anticlockwise_trigger = (1 - round(max(0.001, axes[4]), 2))
 
-        if self._trajectory_parameters.yaw >= self._euler_max:
-            self._trajectory_parameters.yaw = self._euler_max
-        elif self._trajectory_parameters.yaw <= self._euler_min:
-            self._trajectory_parameters.yaw = self._euler_min
+        if angular_clockwise_trigger > 0.0:
+            self._speed.omega = 0.5*pow(angular_clockwise_trigger, 3) * self._max_angular_speed
+            self._speed.vx = 0.0
+            self._speed.vy = 0.0
+        elif angular_anticlockwise_trigger > 0.0:
+            self._speed.omega = - 0.5*pow(angular_anticlockwise_trigger, 3) * self._max_angular_speed
+            self._speed.vx = 0.0
+            self._speed.vy = 0.0
+        elif angular_clockwise_trigger == 0.0 or angular_anticlockwise_trigger == 0.0:
+            self._speed.omega = 0.0
 
-        if buttons[14]:
-            self._trajectory_parameters.pitch = 0.0
-            self._trajectory_parameters.yaw = 0.0
+        if base_height_decrement_btn and self._base_height - self._BASE_HEIGHT_STEP >= self._base_height_min:
+            self._base_height -= self._BASE_HEIGHT_STEP
+        elif base_height_increment_btn and self._base_height + self._BASE_HEIGHT_STEP <= self._base_height_max:
+            self._base_height += self._BASE_HEIGHT_STEP
+
+
+        if pitch_roll_reset_btn:
+            self._roll = 0.0
+            self._pitch = 0.0
             self.get_logger().info("Roll and pitch of the main body moved to zero positions")
+        
+        new_pitch = self._pitch + self._ROLL_PITCH_STEP * pitch_axis
+        new_roll = self._roll - self._ROLL_PITCH_STEP * roll_axis
 
-        # Base height
-        if buttons[0]:
-            self._trajectory_parameters.height -= self._BASE_HEIGHT_STEP
-        elif buttons[4]:
-            self._trajectory_parameters.height += self._BASE_HEIGHT_STEP
+        x = pow(new_roll, 2) / pow(self._roll_max_rad, 2) + pow(new_pitch, 2) / pow(self._pitch_max_rad, 2) 
 
-        if self._trajectory_parameters.height >= self._max_height:
-            self._trajectory_parameters.height = self._max_height
-        elif self._trajectory_parameters.height <= self._min_height:
-            self._trajectory_parameters.height = self._min_height
+        if x <= 1:
+            self._roll = new_roll
+            self._pitch = new_pitch
+            self.send_pitch_command(self._pitch)
+            self.send_roll_command(self._roll)
 
-        # When pad is IDLE
-        if self._trajectory_parameters.vval <= 1e-4 and abs(self._trajectory_parameters.omega) <= 1e-4:
-            self._trajectory_parameters.gait = "STAND"
-        else:
-            self._trajectory_parameters.gait = self._walk_mode_string
+        if change_walk_mode_btn and self._speed.norm() == 0.0:
+            match self._gait_type:
+                case GaitType.WAVE:
+                    self._gait_type = GaitType.RIPPLE
+                    self._max_angular_speed = self._max_angular_vel_ripple
+                    self._max_linear_speed = self._max_angular_vel_ripple
+                case GaitType.RIPPLE:
+                    self._gait_type = GaitType.TRIPOD
+                    self._max_angular_speed = self._max_angular_vel_tripod
+                    self._max_linear_speed = self._max_angular_vel_tripod
+                case GaitType.TRIPOD:
+                    self._gait_type = GaitType.WAVE
+                    self._max_angular_speed = self._max_angular_vel_wave
+                    self._max_linear_speed = self._max_angular_vel_wave
+            self.send_gait_type_command(self._gait_type)
 
-        # Change Walk mode
-        if buttons[3] and (
-                self._walk_mode == 0 or self._walk_mode == 2) and self._trajectory_parameters.gait == "STAND":
-            self._trajectory_parameters.gait = "3POINT"
-            self._walk_mode_string = "3POINT"
-            self._walk_mode = 1
-            self.get_logger().info("Changed walk mode to 3POINT")
-        elif buttons[3] and (
-                self._walk_mode == 0 or self._walk_mode == 1) and self._trajectory_parameters.gait == "STAND":
-            self._trajectory_parameters.gait = "MECHATRONIC"
-            self._walk_mode_string = "MECHATRONIC"
-            self._walk_mode = 2
-            self.get_logger().info("Changed walk mode to MECHATRONIC")
-
-        self._leg_publisher.publish(self._trajectory_parameters)
+        self.send_vel_command(self._speed)
+        self.send_base_height_command(self._base_height)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ElkapodJoyController()
-    rclpy.spin(node)
+    node = ElkapodJoyNode()
+    executor = MultiThreadedExecutor()
+    executor.add_node(node)
+    executor.spin()
+
     node.destroy_node()
     rclpy.shutdown()
 

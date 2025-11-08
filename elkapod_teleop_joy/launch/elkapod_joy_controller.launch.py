@@ -3,10 +3,14 @@ from launch_ros.actions import Node
 from ament_index_python import get_package_share_directory
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription
+import os
 
 
 def generate_launch_description():
     ld = LaunchDescription()
+
+    elkapod_motion_manager_dir = get_package_share_directory('elkapod_motion_manager')
+    config_path = os.path.join(elkapod_motion_manager_dir, 'config', 'elkapod_motion_manager.yaml')
 
     teleop_twist_joy_pkg_prefix = get_package_share_directory('teleop_twist_joy')
     teleop_twist_joy_handler_launch = IncludeLaunchDescription(
@@ -19,7 +23,8 @@ def generate_launch_description():
     ld.add_action(
         Node(
             package='elkapod_teleop_joy',
-            executable='elkapod_joy_controller',
+            executable='joy_controller',
+            parameters=[config_path],
             output='screen',
             emulate_tty=True
         )
