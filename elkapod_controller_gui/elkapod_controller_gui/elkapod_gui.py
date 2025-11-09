@@ -19,9 +19,9 @@ def main(args=None):
     nav_window = ApplicationNavWindow()
     ros_node = ElkapodControllerGui()
     window.node = ros_node
+    nav_window.node = ros_node
     window.setup()
     nav_window.setup()
-    nav_window.node = ros_node
 
     executor = MultiThreadedExecutor()
     executor.add_node(ros_node)
