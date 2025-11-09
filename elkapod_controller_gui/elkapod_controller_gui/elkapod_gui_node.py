@@ -51,17 +51,22 @@ class ElkapodControllerGui(Node):
             Trigger, "/motion_manager_walk_disable")
 
         self._slam_pause_client = self.create_client(Trigger, "/rtabmap/pause")
-        self._slam_resume_client = self.create_client(Trigger, "/rtabmap/resume")
-        self._slam_restart_client = self.create_client(Trigger, "/rtabmap/reset")
+        self._slam_resume_client = self.create_client(
+            Trigger, "/rtabmap/resume")
+        self._slam_restart_client = self.create_client(
+            Trigger, "/rtabmap/reset")
 
-        self._slam_set_mapping_client = self.create_client(Trigger, "/rtabmap/set_mode_mapping")
-        self._slam_set_localization_client = self.create_client(Trigger, "/rtabmap/set_mode_localization")
+        self._slam_set_mapping_client = self.create_client(
+            Trigger, "/rtabmap/set_mode_mapping")
+        self._slam_set_localization_client = self.create_client(
+            Trigger, "/rtabmap/set_mode_localization")
 
         self._odom_pause_client = self.create_client(Trigger, "/pause_odom")
         self._odom_resume_client = self.create_client(Trigger, "/resume_odom")
         self._odom_restart_client = self.create_client(Trigger, "/reset_odom")
-        self._odom_subscriber = self.create_subscription(Odometry, '/icp_odom', self.odometry_callback, 10)
-
+        # self._odom_subscriber = self.create_subscription(
+        #     Odometry, '/icp_odom', self._odometry_callback, 10)
+        # self.odom_function_handler: function = None
         self._send_goal_future = None
         self.ros2_qt_bridge = ROS2QtBridge()
 
@@ -224,24 +229,41 @@ class ElkapodControllerGui(Node):
                 self._service_done_callback)
 
     def send_slam_mapping_cmd(self):
-        result = self._slam_set_mapping_client.wait_for_service(timeout_sec=5.0)
+        result = self._slam_set_mapping_client.wait_for_service(
+            timeout_sec=5.0)
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_mapping_client.call_async(goal)
+            self._send_goal_future = self._slam_set_mapping_client.call_async(
+                goal)
             self._send_goal_future.add_done_callback(
                 self._service_done_callback)
 
     def send_slam_localization_cmd(self):
-        result = self._slam_set_localization_client.wait_for_service(timeout_sec=5.0)
+        result = self._slam_set_localization_client.wait_for_service(
+            timeout_sec=5.0)
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_localization_client.call_async(goal)
+            self._send_goal_future = self._slam_set_localization_client.call_async(
+                goal)
             self._send_goal_future.add_done_callback(
                 self._service_done_callback)
 
-    def odometry_callback(self, msg):
-        self.get_logger().info(f'I heard: {msg.pose.pose.position}')
+    # def _odometry_callback(self, msg):
+    #     if self.odom_function_handler is None:
+    #         print(f'{__name__} has no logic registered')
+    #         print(f'Don\'t know what to do with {msg}')
+    #         return
+    #     self.odom_function_handler(msg)
+
+    # def register_callback_handler(self, function_handler, new_function):
+    #     print(function_handler)
+    #     atr = getattr(self, str(function_handler), None)
+    #     if atr:
+    #         atr = new_function
+    #     else:
+    #         raise AttributeError(
+    #             f"Attribute {str(function_handler)}, cannot be found in {self}")
