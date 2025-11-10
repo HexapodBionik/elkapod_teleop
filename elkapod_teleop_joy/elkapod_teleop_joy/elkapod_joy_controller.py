@@ -151,9 +151,8 @@ class ElkapodJoyNode(Node):
         vval = np.sqrt(np.power(-vlin_axis1, 2) + np.power(vlin_axis2, 2))
         vdir = np.arctan2(vlin_axis1, vlin_axis2)
 
-        self._speed.vx = math.cos(vdir) * vval
-        self._speed.vy = math.sin(vdir) * vval
-
+        self._speed.vx = math.cos(vdir) * vval * self._max_linear_speed
+        self._speed.vy = math.sin(vdir) * vval * self._max_linear_speed
 
         angular_clockwise_trigger = (1 - round(max(0.001, angular_cw_axis), 2))
         angular_anticlockwise_trigger = (1 - round(max(0.001, angular_ccw_axis), 2))
