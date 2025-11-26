@@ -23,7 +23,7 @@ class SpeedCommand:
         self.omega = 0
 
     def norm(self):
-        return math.sqrt(self.vx ** 2 + self.vy ** 2)
+        return math.sqrt(self.vx**2 + self.vy**2)
 
 
 class ROS2QtBridge(QObject):
@@ -36,30 +36,36 @@ class ElkapodControllerGui(Node):
 
         self._cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self._cmd_gait_type_publisher = self.create_publisher(
-            Int32, "/cmd_gait_type", 10)
+            Int32, "/cmd_gait_type", 10
+        )
         self._cmd_base_height_publisher = self.create_publisher(
-            Float64, "/cmd_base_height", 10)
+            Float64, "/cmd_base_height", 10
+        )
         self._cmd_pitch_publisher = self.create_publisher(
-            Float64, "/pitch_setpoint", 10)
-        self._cmd_roll_publisher = self.create_publisher(
-            Float64, "/roll_setpoint", 10)
+            Float64, "/pitch_setpoint", 10
+        )
+        self._cmd_roll_publisher = self.create_publisher(Float64, "/roll_setpoint", 10)
         self._motion_manager_transition_client = ActionClient(
-            self, MotionManagerTrigger, "/motion_manager_transition")
+            self, MotionManagerTrigger, "/motion_manager_transition"
+        )
         self._motion_manager_walk_enable_client = self.create_client(
-            Trigger, "/motion_manager_walk_enable", )
+            Trigger,
+            "/motion_manager_walk_enable",
+        )
         self._motion_manager_walk_disable_client = self.create_client(
-            Trigger, "/motion_manager_walk_disable")
+            Trigger, "/motion_manager_walk_disable"
+        )
 
         self._slam_pause_client = self.create_client(Trigger, "/rtabmap/pause")
-        self._slam_resume_client = self.create_client(
-            Trigger, "/rtabmap/resume")
-        self._slam_restart_client = self.create_client(
-            Trigger, "/rtabmap/reset")
+        self._slam_resume_client = self.create_client(Trigger, "/rtabmap/resume")
+        self._slam_restart_client = self.create_client(Trigger, "/rtabmap/reset")
 
         self._slam_set_mapping_client = self.create_client(
-            Trigger, "/rtabmap/set_mode_mapping")
+            Trigger, "/rtabmap/set_mode_mapping"
+        )
         self._slam_set_localization_client = self.create_client(
-            Trigger, "/rtabmap/set_mode_localization")
+            Trigger, "/rtabmap/set_mode_localization"
+        )
 
         self._odom_pause_client = self.create_client(Trigger, "/pause_odom")
         self._odom_resume_client = self.create_client(Trigger, "/resume_odom")
@@ -111,21 +117,22 @@ class ElkapodControllerGui(Node):
 
         if transition in possible_transitions:
             result = self._motion_manager_transition_client.wait_for_server(
-                timeout_sec=5.0)
+                timeout_sec=5.0
+            )
             if not result:
                 self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
             else:
                 goal_msg = MotionManagerTrigger.Goal()
                 goal_msg.transition = transition
-                self._send_goal_future = self._motion_manager_transition_client.send_goal_async(
-                    goal_msg)
-                self._send_goal_future.add_done_callback(
-                    self._goal_response_callback)
+                self._send_goal_future = (
+                    self._motion_manager_transition_client.send_goal_async(goal_msg)
+                )
+                self._send_goal_future.add_done_callback(self._goal_response_callback)
 
     def _goal_response_callback(self, future):
         goal_handle = future.result()
         if not goal_handle.accepted:
-            self.get_logger().info('Goal rejected :(')
+            self.get_logger().info("Goal rejected :(")
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             self._done_future = goal_handle.get_result_async()
@@ -146,27 +153,29 @@ class ElkapodControllerGui(Node):
 
     def send_walk_enable_cmd(self):
         result = self._motion_manager_walk_enable_client.wait_for_service(
-            timeout_sec=5.0)
+            timeout_sec=5.0
+        )
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._motion_manager_walk_enable_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+                goal
+            )
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_walk_disable_cmd(self):
         result = self._motion_manager_walk_disable_client.wait_for_service(
-            timeout_sec=5.0)
+            timeout_sec=5.0
+        )
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
-            self._send_goal_future = self._motion_manager_walk_disable_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future = (
+                self._motion_manager_walk_disable_client.call_async(goal)
+            )
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_slam_pause_cmd(self):
         result = self._slam_pause_client.wait_for_service(timeout_sec=5.0)
@@ -175,8 +184,7 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._slam_pause_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_slam_resume_cmd(self):
         result = self._slam_resume_client.wait_for_service(timeout_sec=5.0)
@@ -185,8 +193,7 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._slam_resume_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_slam_restart_cmd(self):
         result = self._slam_restart_client.wait_for_service(timeout_sec=5.0)
@@ -195,8 +202,7 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._slam_restart_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_odom_pause_cmd(self):
         result = self._odom_pause_client.wait_for_service(timeout_sec=5.0)
@@ -205,8 +211,7 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._odom_pause_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_odom_resume_cmd(self):
         result = self._odom_resume_client.wait_for_service(timeout_sec=5.0)
@@ -215,8 +220,7 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._odom_resume_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_odom_restart_cmd(self):
         result = self._odom_restart_client.wait_for_service(timeout_sec=5.0)
@@ -225,32 +229,25 @@ class ElkapodControllerGui(Node):
         else:
             goal = Trigger.Request()
             self._send_goal_future = self._odom_restart_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_slam_mapping_cmd(self):
-        result = self._slam_set_mapping_client.wait_for_service(
-            timeout_sec=5.0)
+        result = self._slam_set_mapping_client.wait_for_service(timeout_sec=5.0)
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_mapping_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future = self._slam_set_mapping_client.call_async(goal)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     def send_slam_localization_cmd(self):
-        result = self._slam_set_localization_client.wait_for_service(
-            timeout_sec=5.0)
+        result = self._slam_set_localization_client.wait_for_service(timeout_sec=5.0)
         if not result:
             self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
         else:
             goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_localization_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            self._send_goal_future = self._slam_set_localization_client.call_async(goal)
+            self._send_goal_future.add_done_callback(self._service_done_callback)
 
     # def _odometry_callback(self, msg):
     #     if self.odom_function_handler is None:

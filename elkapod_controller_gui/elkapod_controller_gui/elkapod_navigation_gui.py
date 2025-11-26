@@ -1,8 +1,5 @@
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import (
-    QWidget,
-    QLabel
-)
+from PySide6.QtWidgets import QWidget, QLabel
 
 from .elkapod_navigation_ui import Ui_Form
 from .elkapod_gui_node import SpeedCommand, GaitType
@@ -36,8 +33,7 @@ class ApplicationNavWindow(QWidget):
     def setup(self):
         self.update_status_label(self._ui.slam_status, NodeStatus.OFF)
         self._ui.slam_mode_combo.addItems([self.MAPPING, self.LOCALIZATION])
-        self._ui.slam_mode_combo.currentTextChanged.connect(
-            self._update_slam_mode)
+        self._ui.slam_mode_combo.currentTextChanged.connect(self._update_slam_mode)
 
         self._ui.slam_resume.pressed.connect(self._resume_slam)
         self._ui.slam_pause.pressed.connect(self._pause_slam)

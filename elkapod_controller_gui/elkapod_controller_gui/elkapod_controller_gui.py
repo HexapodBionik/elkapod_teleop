@@ -1,7 +1,4 @@
-from PySide6.QtWidgets import (
-    QMainWindow,
-    QMessageBox
-)
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 import math
 
@@ -36,10 +33,14 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.idle_transition_button.pressed.connect(self._send_idle_transition)
         self._ui.walk_transition_button.pressed.connect(self._send_walk_transition)
 
-        self.node.ros2_qt_bridge.send_async_cmd_signal.connect(self._on_transition_result)
+        self.node.ros2_qt_bridge.send_async_cmd_signal.connect(
+            self._on_transition_result
+        )
 
         self._ui.angular_vel_slider.sliderMoved.connect(self._update_angular_vel_slider)
-        self._ui.angular_vel_spinbox.valueChanged.connect(self._update_angular_vel_spinbox)
+        self._ui.angular_vel_spinbox.valueChanged.connect(
+            self._update_angular_vel_spinbox
+        )
         self._ui.angular_vel_stopbutton.pressed.connect(self._update_angular_vel_button)
 
         self._ui.roll_slider.sliderMoved.connect(self._update_roll_slider)
@@ -51,16 +52,22 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.pitch_reset_button.pressed.connect(self._update_pitch_button)
 
         self._ui.base_height_slider.sliderMoved.connect(self._update_base_height_slider)
-        self._ui.base_height_spinbox.valueChanged.connect(self._update_base_height_spinbox)
-        self._ui.base_height_default_button.pressed.connect(self._update_base_height_button)
+        self._ui.base_height_spinbox.valueChanged.connect(
+            self._update_base_height_spinbox
+        )
+        self._ui.base_height_default_button.pressed.connect(
+            self._update_base_height_button
+        )
 
         self._ui.actionAbout.triggered.connect(self._show_about_message)
 
-        self._ui.gait_selection.addItems([
-            'TRIPOD',
-            'WAVE',
-            'RIPPLE',
-        ])
+        self._ui.gait_selection.addItems(
+            [
+                "TRIPOD",
+                "WAVE",
+                "RIPPLE",
+            ]
+        )
         self._ui.gait_selection.currentTextChanged.connect(self._update_gait)
 
         self._robot_state = RobotState.START
@@ -79,13 +86,13 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_vel_command(self._speed)
 
     def _update_angular_vel_slider(self, omega: str):
-        omega = -0.5 + float(omega) / 100.
+        omega = -0.5 + float(omega) / 100.0
         self._ui.angular_vel_spinbox.setValue(omega)
         self._send_angular_vel_command(omega)
 
     def _update_angular_vel_spinbox(self, omega: str):
         omega = float(omega)
-        slider_value = (omega + 0.5) * 100.
+        slider_value = (omega + 0.5) * 100.0
         self._ui.angular_vel_slider.setValue(slider_value)
         self._send_angular_vel_command(omega)
 
@@ -95,15 +102,15 @@ class ApplicationMainWindow(QMainWindow):
         self._send_angular_vel_command(0.0)
 
     def _update_roll_slider(self, roll: str):
-        roll_deg = -3.0 + (float(roll) / 100.) * 6.
-        roll_rad = roll_deg * math.pi / 180.
+        roll_deg = -3.0 + (float(roll) / 100.0) * 6.0
+        roll_rad = roll_deg * math.pi / 180.0
         self._ui.roll_spinbox.setValue(roll_deg)
         self.node.send_roll_command(roll_rad)
 
     def _update_roll_spinbox(self, roll: str):
         roll_deg = float(roll)
-        roll_rad = roll_deg * math.pi / 180.
-        slider_value = (roll_deg + 3.0) / 6. * 100.
+        roll_rad = roll_deg * math.pi / 180.0
+        slider_value = (roll_deg + 3.0) / 6.0 * 100.0
         self._ui.roll_slider.setValue(slider_value)
         self.node.send_roll_command(roll_rad)
 
@@ -113,15 +120,15 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_roll_command(0.0)
 
     def _update_pitch_slider(self, pitch: str):
-        pitch_deg = -6.0 + (float(pitch) / 100.) * 12.
-        pitch_rad = pitch_deg * math.pi / 180.
+        pitch_deg = -6.0 + (float(pitch) / 100.0) * 12.0
+        pitch_rad = pitch_deg * math.pi / 180.0
         self._ui.pitch_spinbox.setValue(pitch_deg)
         self.node.send_pitch_command(pitch_rad)
 
     def _update_pitch_spinbox(self, pitch: str):
         pitch_deg = float(pitch)
-        pitch_rad = pitch_deg * math.pi / 180.
-        slider_value = (pitch_deg + 6.0) / 12. * 100.
+        pitch_rad = pitch_deg * math.pi / 180.0
+        slider_value = (pitch_deg + 6.0) / 12.0 * 100.0
         self._ui.pitch_slider.setValue(slider_value)
         self.node.send_pitch_command(pitch_rad)
 
@@ -131,13 +138,13 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_pitch_command(0.0)
 
     def _update_base_height_slider(self, height: str):
-        base_height = 0.09 + (float(height) / 100.) * 0.07
+        base_height = 0.09 + (float(height) / 100.0) * 0.07
         self._ui.base_height_spinbox.setValue(base_height)
         self.node.send_base_height_command(base_height)
 
     def _update_base_height_spinbox(self, height: str):
         base_height = float(height)
-        slider_value = (base_height - 0.09) / 0.07 * 100.
+        slider_value = (base_height - 0.09) / 0.07 * 100.0
         self._ui.base_height_slider.setValue(slider_value)
         self.node.send_base_height_command(base_height)
 
@@ -201,12 +208,12 @@ class ApplicationMainWindow(QMainWindow):
             self._ui.transition_status_label.setStyleSheet("color: #DA2C43")
 
     def _update_vval_slider(self, vval):
-        value = float(vval) / 100. * self._current_max_speed
+        value = float(vval) / 100.0 * self._current_max_speed
         self._ui.vval_spinbox.setValue(value)
         self._update_vval(value)
 
     def _update_vval_spinbox(self, vval):
-        slider_value = min(round(float(vval) / self._current_max_speed * 100.), 100)
+        slider_value = min(round(float(vval) / self._current_max_speed * 100.0), 100)
         self._ui.vval_slider.setValue(slider_value)
         self._update_vval(float(vval))
 
@@ -226,7 +233,7 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_vel_command(self._speed)
 
     def _update_vdir_dial(self, vdir):
-        vdir = -float(vdir) + 180.
+        vdir = -float(vdir) + 180.0
         self._ui.vdir_spinbox.setValue(vdir)
         self.update_vdir(vdir)
 
@@ -236,7 +243,7 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.vdir_dial.setValue(-vdir + 180.0)
 
     def update_vdir(self, vdir):
-        vdir = vdir * math.pi / 180.
+        vdir = vdir * math.pi / 180.0
         vval = self._speed.norm()
 
         self._speed.vx = math.cos(vdir) * vval
@@ -265,6 +272,5 @@ class ApplicationMainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "Elkapod Control GUI",
-            "Version: 1.0.0\n"
-            "Copyright (c) 2025 Elkapod Bionik, WUT"
+            "Version: 1.0.0\nCopyright (c) 2025 Elkapod Bionik, WUT",
         )
