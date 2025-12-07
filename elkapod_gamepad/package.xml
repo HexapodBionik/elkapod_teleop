@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>elkapod_teleop_joy</name>
+  <name>elkapod_gamepad</name>
   <version>1.0.0</version>
   <description>Joystick teleop for Elkapod walking robot.</description>
   <maintainer email="piotrpatek17@gmail.com">Piotr Patek</maintainer>

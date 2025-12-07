@@ -38,7 +38,7 @@ def generate_launch_description():
 
     ld.add_action(
         Node(
-            package="elkapod_teleop_joy",
+            package="elkapod_gamepad",
             executable="joy_controller",
             parameters=[config_path, {"gamepad_model": gamepad_model}],
             output="screen",

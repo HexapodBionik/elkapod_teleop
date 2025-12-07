@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = "elkapod_teleop_joy"
+package_name = "elkapod_gamepad"
 data_files = []
 data_files.append(
     ("share/ament_index/resource_index/packages", ["resource/" + package_name])
@@ -29,7 +29,8 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "joy_controller = elkapod_teleop_joy.elkapod_joy_controller:main"
+            "joy_controller = elkapod_gamepad.elkapod_joy_controller:main",
+            "feedback_controller = elkapod_gamepad.elkapod_joy_feedback_node:main",
         ],
     },
 )
