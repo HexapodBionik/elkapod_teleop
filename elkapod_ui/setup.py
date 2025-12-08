@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = "elkapod_controller_gui"
+package_name = "elkapod_ui"
 
 setup(
     name=package_name,
@@ -25,7 +25,7 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "elkapod_controller_gui = elkapod_controller_gui.elkapod_gui:main"
+            "elkapod_ui = elkapod_ui.elkapod_gui:main"
         ],
     },
 )
