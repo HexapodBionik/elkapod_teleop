@@ -5,6 +5,11 @@ from rclpy.executors import MultiThreadedExecutor
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64, Int32
 from sensor_msgs.msg import Joy
+from std_srvs.srv import Trigger
+from rclpy.action import ActionClient
+from elkapod_msgs.action import MotionManagerTrigger
+from elkapod_msgs.srv import GenerateFeedback
+from diagnostic_msgs.msg import DiagnosticArray
 import math
 import numpy as np
 
@@ -23,6 +28,13 @@ class SpeedCommand:
 
     def norm(self):
         return math.sqrt(self.vx**2 + self.vy**2)
+
+
+class RobotState(Enum):
+    INIT = 0
+    IDLE_LOWERED = 1
+    IDLE = 2
+    WALKING = 3
 
 
 class ElkapodJoyNode(Node):
@@ -113,7 +125,6 @@ class ElkapodJoyNode(Node):
         self._joy_subscriber = self.create_subscription(
             Joy, "/joy", self._joystick_callback, 10
         )
-        self._command_timer = self.create_timer(0.05, self._send_commands_callback)
 
         self._cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self._cmd_gait_type_publisher = self.create_publisher(
@@ -126,6 +137,25 @@ class ElkapodJoyNode(Node):
             Float64, "/pitch_setpoint", 10
         )
         self._cmd_roll_publisher = self.create_publisher(Float64, "/roll_setpoint", 10)
+
+        self._motion_manager_transition_client = ActionClient(
+            self, MotionManagerTrigger, "/motion_manager_transition"
+        )
+        self._motion_manager_walk_enable_client = self.create_client(
+            Trigger,
+            "/motion_manager_walk_enable",
+        )
+        self._motion_manager_walk_disable_client = self.create_client(
+            Trigger, "/motion_manager_walk_disable"
+        )
+
+        self._generate_joy_feedback_client = self.create_client(
+            GenerateFeedback, "/joy_generate_feedback"
+        )
+
+        self.subscription = self.create_subscription(
+            DiagnosticArray, "/diagnostics", self._diagnostic_callback, 10
+        )
 
         self._base_height_min = (
             self.get_parameter("base_height.min").get_parameter_value().double_value
@@ -170,7 +200,7 @@ class ElkapodJoyNode(Node):
             self.get_parameter("gamepad_model").get_parameter_value().string_value
         )
 
-        self._supported_gamepad_models = ["xbox-series-x", "logitech-f710"]
+        self._supported_gamepad_models = ["xbox-series-x"]
 
         if self._gamepad_model not in self._supported_gamepad_models:
             raise ValueError(
@@ -186,10 +216,165 @@ class ElkapodJoyNode(Node):
         self._max_angular_speed = self._max_angular_vel_tripod
         self._max_linear_speed = self._max_vel_tripod
 
+        self._robot_state = RobotState.INIT
+        self._next_state = RobotState.IDLE_LOWERED
+        self._transition_flag = False
+
         self._change_walk_pressed = False
 
-    def _send_commands_callback(self):
-        pass
+    def _diagnostic_callback(self, msg: DiagnosticArray):
+        for status in msg.status:
+            if status.name == "ElkapodMotionManager: State":
+                for kv in status.values:
+                    if kv.key == "state":
+                        self._robot_state = self.string_to_state(kv.value)
+
+    def _send_idle_transition(self):
+        if self._robot_state == RobotState.IDLE_LOWERED:
+            self._send_motion_manager_transition("stand_up")
+        elif self._robot_state == RobotState.WALKING:
+            self.send_walk_disable_cmd()
+        self._next_state = RobotState.IDLE
+        self.get_logger().info(
+            f"Starting transition to {self.state_to_string(self._next_state)} ..."
+        )
+
+    def _send_walk_transition(self):
+        self.send_walk_enable_cmd()
+        self._next_state = RobotState.WALKING
+        self.get_logger().info(
+            f"Starting transition to {self.state_to_string(self._next_state)} ..."
+        )
+
+    def _send_init_transition(self):
+        if self._robot_state == RobotState.INIT:
+            self._send_motion_manager_transition("init")
+        elif self._robot_state == RobotState.IDLE:
+            self._send_motion_manager_transition("lower")
+            self._next_state = RobotState.IDLE_LOWERED
+
+    @staticmethod
+    def state_to_string(state: RobotState):
+        state_to_str = {
+            RobotState.INIT: "init",
+            RobotState.IDLE_LOWERED: "idle_lowered",
+            RobotState.IDLE: "idle",
+            RobotState.WALKING: "walking",
+        }
+        return state_to_str.get(state)
+
+    @staticmethod
+    def string_to_state(state: str):
+        str_to_state = {
+            "init": RobotState.INIT,
+            "idle_lowered": RobotState.IDLE_LOWERED,
+            "idle": RobotState.IDLE,
+            "walking": RobotState.WALKING,
+        }
+        return str_to_state.get(state)
+
+    def _on_transition_result(self, result: bool):
+        if result:
+            self.get_logger().info(
+                f"Transition to {self.state_to_string(self._next_state)} succeded!"
+            )
+            self._robot_state = self._next_state
+            self._next_state = None
+        else:
+            self.get_logger().warn(
+                f"Transition to {self.state_to_string(self._next_state)} failed!"
+            )
+            self._next_state = None
+
+    def _send_motion_manager_transition(self, transition: str):
+        possible_transitions = ["init", "stand_up", "lower"]
+
+        if not self._transition_flag:
+            if transition in possible_transitions:
+                result = self._motion_manager_transition_client.wait_for_server(
+                    timeout_sec=5.0
+                )
+                if result:
+                    goal_msg = MotionManagerTrigger.Goal()
+                    goal_msg.transition = transition
+                    self._send_goal_future = (
+                        self._motion_manager_transition_client.send_goal_async(goal_msg)
+                    )
+                    self._send_goal_future.add_done_callback(
+                        self._goal_response_callback
+                    )
+                else:
+                    self.get_logger().error(
+                        "Transition failed! Motion manager transition client not available!"
+                    )
+        else:
+            self.get_logger().warn("Other transition ongoing, transition goal rejected")
+
+    def _goal_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().warn("Goal rejected :(")
+        else:
+            self._transition_flag = True
+            self._done_future = goal_handle.get_result_async()
+            self._done_future.add_done_callback(self._done_callback)
+
+    def _done_callback(self, future):
+        self._on_transition_result(future.result().result)
+        result = self._generate_joy_feedback_client.wait_for_service(timeout_sec=1.0)
+        if result:
+            goal = GenerateFeedback.Request()
+            goal.duration = 0.3
+            goal.intensivity = 1.0
+            self._generate_joy_feedback_client.call_async(goal)
+        self._transition_flag = False
+
+    def _service_done_callback(self, future):
+        self._on_transition_result(future.result().success)
+        result = self._generate_joy_feedback_client.wait_for_service(timeout_sec=1.0)
+        if result:
+            goal = GenerateFeedback.Request()
+            goal.duration = 0.3
+            goal.intensivity = 1.0
+            self._generate_joy_feedback_client.call_async(goal)
+
+        self._transition_flag = False
+
+    def send_walk_enable_cmd(self):
+        if not self._transition_flag:
+            result = self._motion_manager_walk_enable_client.wait_for_service(
+                timeout_sec=5.0
+            )
+            if result:
+                goal = Trigger.Request()
+                self._send_goal_future = (
+                    self._motion_manager_walk_enable_client.call_async(goal)
+                )
+                self._send_goal_future.add_done_callback(self._service_done_callback)
+            else:
+                self.get_logger().error(
+                    "Transition failed! Motion manager transition client not available!"
+                )
+        else:
+            self.get_logger().warn("Other transition ongoing, transition goal rejected")
+
+    def send_walk_disable_cmd(self):
+        if not self._transition_flag:
+            result = self._motion_manager_walk_disable_client.wait_for_service(
+                timeout_sec=5.0
+            )
+            if result:
+                goal = Trigger.Request()
+                self._send_goal_future = (
+                    self._motion_manager_walk_disable_client.call_async(goal)
+                )
+                self._send_goal_future.add_done_callback(self._service_done_callback)
+            else:
+                self.get_logger().error(
+                    "Transition failed! Motion manager transition client not available!"
+                )
+        else:
+            self.get_logger().warn("Other transition ongoing, transition goal rejected")
 
     def send_gait_type_command(self, gait_type: GaitType):
         msg = Int32()
@@ -236,31 +421,44 @@ class ElkapodJoyNode(Node):
             vlin_axis1 = axes[0]
             vlin_axis2 = axes[1]
             angular_cw_axis = axes[5]
-            angular_ccw_axis = axes[4]
+            angular_ccw_axis = axes[2]
             pitch_axis = axes[3]
-            roll_axis = axes[2]
+            roll_axis = axes[4]
+            sprint_btn = buttons[9]
             pitch_roll_reset_btn = buttons[11]
-            base_height_increment_btn = buttons[3]
-            base_height_decrement_btn = buttons[0]
+            transition_trigger_up = buttons[3]
+            transition_trigger_down = buttons[0]
+            body_height_axis = axes[7]
+
             change_walk_mode_btn = buttons[2]
-        elif self._gamepad_model == "logitech-f710":
-            vlin_axis1 = axes[0]
-            vlin_axis2 = axes[1]
-            angular_cw_axis = axes[2]
-            angular_ccw_axis = axes[5]
-            pitch_axis = axes[4]
-            roll_axis = axes[3]
-            pitch_roll_reset_btn = buttons[10]
-            base_height_increment_btn = buttons[3]
-            base_height_decrement_btn = buttons[0]
-            change_walk_mode_btn = buttons[2]
+
+        if not self._transition_flag:
+            if transition_trigger_up:
+                match self._robot_state:
+                    case RobotState.INIT:
+                        self._send_init_transition()
+                    case RobotState.IDLE_LOWERED:
+                        self._send_idle_transition()
+                    case RobotState.IDLE:
+                        self._send_walk_transition()
+            elif transition_trigger_down:
+                match self._robot_state:
+                    case RobotState.IDLE:
+                        self._send_init_transition()
+                    case RobotState.WALKING:
+                        self.send_walk_disable_cmd()
+                        self._next_state = RobotState.IDLE
 
         # Linear velocity value and direction
         vval = np.sqrt(np.power(-vlin_axis1, 2) + np.power(vlin_axis2, 2))
         vdir = np.arctan2(vlin_axis1, vlin_axis2)
 
-        self._speed.vx = math.cos(vdir) * vval * self._max_linear_speed
-        self._speed.vy = math.sin(vdir) * vval * self._max_linear_speed
+        scaling = 1.0
+        if not sprint_btn:
+            scaling = 0.5
+
+        self._speed.vx = math.cos(vdir) * vval * self._max_linear_speed * scaling
+        self._speed.vy = math.sin(vdir) * vval * self._max_linear_speed * scaling
 
         angular_clockwise_trigger = 1 - round(max(0.001, angular_cw_axis), 2)
         angular_anticlockwise_trigger = 1 - round(max(0.001, angular_ccw_axis), 2)
@@ -280,16 +478,10 @@ class ElkapodJoyNode(Node):
         elif angular_clockwise_trigger == 0.0 or angular_anticlockwise_trigger == 0.0:
             self._speed.omega = 0.0
 
-        if (
-            base_height_decrement_btn
-            and self._base_height - self._BASE_HEIGHT_STEP >= self._base_height_min
-        ):
-            self._base_height -= self._BASE_HEIGHT_STEP
-        elif (
-            base_height_increment_btn
-            and self._base_height + self._BASE_HEIGHT_STEP <= self._base_height_max
-        ):
-            self._base_height += self._BASE_HEIGHT_STEP
+        self._base_height += body_height_axis * self._BASE_HEIGHT_STEP
+        self._base_height = max(
+            self._base_height_min, min(self._base_height, self._base_height_max)
+        )
 
         if pitch_roll_reset_btn:
             self._roll = 0.0
@@ -345,7 +537,7 @@ class ElkapodJoyNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = ElkapodJoyNode()
-    executor = MultiThreadedExecutor()
+    executor = MultiThreadedExecutor(num_threads=2)
     executor.add_node(node)
     executor.spin()
 

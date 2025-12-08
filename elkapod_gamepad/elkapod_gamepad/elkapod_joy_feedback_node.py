@@ -30,6 +30,7 @@ class ElkapodJoyFeedbackNode(Node):
         self._feedback_timer = self.create_timer(
             0.1, self._feedback_timer_callback
         )  # 10 Hz
+        self.get_logger().info("Feedback controller node started!")
 
     def _start_generator_callback(
         self, request: GenerateFeedback_Request, response: GenerateFeedback_Response
@@ -62,8 +63,6 @@ class ElkapodJoyFeedbackNode(Node):
         if elapsed < self._duration:
             self._publish_feedback(self._intensivity)
         else:
-            self.get_logger().info("Stopping vibration")
-
             self._publish_feedback(0.0)
 
             self._feedback_generated_flag = False

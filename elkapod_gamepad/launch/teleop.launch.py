@@ -46,4 +46,13 @@ def generate_launch_description():
         )
     )
 
+    ld.add_action(
+        Node(
+            package="elkapod_gamepad",
+            executable="feedback_controller",
+            output="screen",
+            emulate_tty=True,
+        )
+    )
+
     return ld
