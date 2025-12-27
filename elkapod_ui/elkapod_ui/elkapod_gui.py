@@ -1,13 +1,14 @@
-import rclpy
-from rclpy.executors import MultiThreadedExecutor
-from .elkapod_gui_node import ElkapodControllerGui
-from .elkapod_controller_gui import ApplicationMainWindow
-from .elkapod_navigation_gui import ApplicationNavWindow
-from .elkapod_controller_ui import QApplication
+import signal
 import sys
 import threading
-import os
-import signal
+
+import rclpy
+from PySide6.QtWidgets import QApplication
+from rclpy.executors import MultiThreadedExecutor
+
+from .elkapod_controller_gui import ApplicationMainWindow
+from .elkapod_gui_node import ElkapodControllerGui
+from .elkapod_navigation_gui import ApplicationNavWindow
 
 
 def main(args=None):

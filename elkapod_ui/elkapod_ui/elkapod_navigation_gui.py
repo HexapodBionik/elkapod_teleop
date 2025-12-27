@@ -1,10 +1,9 @@
-from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import QWidget, QLabel
-
-from .elkapod_navigation_ui import Ui_Form
-from .elkapod_gui_node import SpeedCommand, GaitType
-from .elkapod_gui_node import ElkapodControllerGui
 from enum import Enum
+
+from PySide6.QtWidgets import QLabel, QWidget
+
+from .elkapod_gui_node import ElkapodControllerGui
+from .elkapod_navigation_ui import Ui_Form
 
 
 class NodeStatus(Enum):

@@ -1,13 +1,13 @@
+import math
 from enum import Enum
-from rclpy.node import Node
+
+from elkapod_msgs.action import MotionManagerTrigger
 from geometry_msgs.msg import Twist
+from PySide6.QtCore import QObject, Signal
+from rclpy.action import ActionClient
+from rclpy.node import Node
 from std_msgs.msg import Float64, Int32
 from std_srvs.srv import Trigger
-from nav_msgs.msg import Odometry
-from elkapod_msgs.action import MotionManagerTrigger
-from rclpy.action import ActionClient
-from PySide6.QtCore import QObject, Signal
-import math
 
 
 class GaitType(Enum):

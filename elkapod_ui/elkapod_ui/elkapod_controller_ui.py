@@ -1,55 +1,22 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'elkapod_controller2RTxmwx.ui'
+## Form generated from reading UI file 'elkapod_controllerLZkhWv.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (
-    QCoreApplication,
-    QDate,
-    QDateTime,
-    QLocale,
-    QMetaObject,
-    QObject,
-    QPoint,
-    QRect,
-    QSize,
-    QTime,
-    QUrl,
-    Qt,
-)
-from PySide6.QtGui import (
-    QAction,
-    QBrush,
-    QColor,
-    QConicalGradient,
-    QCursor,
-    QFont,
-    QFontDatabase,
-    QGradient,
-    QIcon,
-    QImage,
-    QKeySequence,
-    QLinearGradient,
-    QPainter,
-    QPalette,
-    QPixmap,
-    QRadialGradient,
-    QTransform,
-)
+from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QSize, Qt
+from PySide6.QtGui import QAction, QBrush, QColor, QFont, QIcon, QPalette
 from PySide6.QtWidgets import (
-    QApplication,
     QComboBox,
     QDial,
     QDoubleSpinBox,
     QFrame,
     QHBoxLayout,
     QLabel,
-    QMainWindow,
     QMenu,
     QMenuBar,
     QProgressBar,
@@ -74,7 +41,12 @@ class Ui_HexapodController(object):
         if QIcon.hasThemeIcon(iconThemeName):
             icon = QIcon.fromTheme(iconThemeName)
         else:
-            icon.addFile(".", QSize(), QIcon.Normal, QIcon.Off)
+            icon.addFile(
+                "../Elkapod/elkapod_sim_ws/src/elkapod_teleop/elkapod_ui/elkapod_ui",
+                QSize(),
+                QIcon.Normal,
+                QIcon.Off,
+            )
 
         HexapodController.setWindowIcon(icon)
         self.actionAbout = QAction(HexapodController)
@@ -85,6 +57,17 @@ class Ui_HexapodController(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.tabWidget = QTabWidget(self.central_widget)
         self.tabWidget.setObjectName("tabWidget")
+        palette = QPalette()
+        brush = QBrush(QColor(0, 0, 0, 13))
+        brush.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.Window, brush)
+        brush1 = QBrush(QColor(0, 0, 0, 8))
+        brush1.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        brush2 = QBrush(QColor(0, 0, 0, 5))
+        brush2.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Disabled, QPalette.Window, brush2)
+        self.tabWidget.setPalette(palette)
         self.Init = QWidget()
         self.Init.setObjectName("Init")
         self.verticalLayout_14 = QVBoxLayout(self.Init)
@@ -149,21 +132,24 @@ class Ui_HexapodController(object):
         self.Walk = QWidget()
         self.Walk.setObjectName("Walk")
         self.Walk.setEnabled(False)
+        palette1 = QPalette()
+        brush2 = QBrush(QColor(0, 0, 0, 31))
+        brush2.setStyle(Qt.SolidPattern)
+        palette1.setBrush(QPalette.Active, QPalette.Window, brush2)
+        palette1.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette1.setBrush(QPalette.Disabled, QPalette.Window, brush)
+        self.Walk.setPalette(palette1)
         self.verticalLayout_16 = QVBoxLayout(self.Walk)
         self.verticalLayout_16.setObjectName("verticalLayout_16")
         self.verticalLayout_15 = QVBoxLayout()
         self.verticalLayout_15.setObjectName("verticalLayout_15")
         self.verticalWidget_2 = QWidget(self.Walk)
         self.verticalWidget_2.setObjectName("verticalWidget_2")
-        palette = QPalette()
-        brush = QBrush(QColor(60, 60, 60, 255))
-        brush.setStyle(Qt.SolidPattern)
-        palette.setBrush(QPalette.Active, QPalette.Window, brush)
-        brush1 = QBrush(QColor(50, 50, 50, 255))
-        brush1.setStyle(Qt.SolidPattern)
-        palette.setBrush(QPalette.Inactive, QPalette.Window, brush1)
-        palette.setBrush(QPalette.Disabled, QPalette.Window, brush)
-        self.verticalWidget_2.setPalette(palette)
+        palette2 = QPalette()
+        palette2.setBrush(QPalette.Active, QPalette.Window, brush2)
+        palette2.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette2.setBrush(QPalette.Disabled, QPalette.Window, brush)
+        self.verticalWidget_2.setPalette(palette2)
         self.velocity_widget = QVBoxLayout(self.verticalWidget_2)
         self.velocity_widget.setObjectName("velocity_widget")
         self.velocity_widget.setContentsMargins(-1, 10, -1, 10)
@@ -459,26 +445,21 @@ class Ui_HexapodController(object):
 
         self.velocity_title = QLabel(self.verticalWidget_2)
         self.velocity_title.setObjectName("velocity_title")
-        palette1 = QPalette()
-        brush2 = QBrush(QColor(229, 165, 10, 255))
-        brush2.setStyle(Qt.SolidPattern)
-        palette1.setBrush(QPalette.Active, QPalette.Base, brush2)
-        brush3 = QBrush(QColor(36, 36, 36, 255))
+        palette3 = QPalette()
+        brush3 = QBrush(QColor(229, 165, 10, 255))
         brush3.setStyle(Qt.SolidPattern)
-        palette1.setBrush(QPalette.Inactive, QPalette.Base, brush3)
-        palette1.setBrush(QPalette.Disabled, QPalette.Base, brush1)
-        self.velocity_title.setPalette(palette1)
+        palette3.setBrush(QPalette.Active, QPalette.Base, brush3)
+        brush4 = QBrush(QColor(36, 36, 36, 255))
+        brush4.setStyle(Qt.SolidPattern)
+        palette3.setBrush(QPalette.Inactive, QPalette.Base, brush4)
+        palette3.setBrush(QPalette.Disabled, QPalette.Base, brush1)
+        self.velocity_title.setPalette(palette3)
         self.velocity_title.setFont(font)
 
         self.velocity_widget.addWidget(self.velocity_title)
 
         self.horizontalWidget_7 = QWidget(self.verticalWidget_2)
         self.horizontalWidget_7.setObjectName("horizontalWidget_7")
-        palette2 = QPalette()
-        palette2.setBrush(QPalette.Active, QPalette.Window, brush)
-        palette2.setBrush(QPalette.Inactive, QPalette.Window, brush1)
-        palette2.setBrush(QPalette.Disabled, QPalette.Window, brush)
-        self.horizontalWidget_7.setPalette(palette2)
         self.horizontalLayout_12 = QHBoxLayout(self.horizontalWidget_7)
         self.horizontalLayout_12.setObjectName("horizontalLayout_12")
         self.horizontalLayout_12.setContentsMargins(-1, 10, -1, 10)
@@ -709,7 +690,7 @@ class Ui_HexapodController(object):
             )
         )
         self.label.setText(
-            QCoreApplication.translate("HexapodController", "Angle (rad)", None)
+            QCoreApplication.translate("HexapodController", "Angle", None)
         )
         self.velocity_value_title.setText(
             QCoreApplication.translate(

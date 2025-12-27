@@ -1,10 +1,10 @@
+import math
+from enum import Enum
+
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 
-import math
-
 from .elkapod_controller_ui import Ui_HexapodController
-from .elkapod_gui_node import SpeedCommand, GaitType, ElkapodControllerGui
-from enum import Enum
+from .elkapod_gui_node import ElkapodControllerGui, GaitType, SpeedCommand
 
 
 class RobotState(Enum):

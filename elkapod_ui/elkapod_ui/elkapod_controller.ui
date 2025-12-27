@@ -15,12 +15,49 @@
   </property>
   <property name="windowIcon">
    <iconset theme="battery">
-    <normaloff>.</normaloff>.</iconset>
+    <normaloff>../Elkapod/elkapod_sim_ws/src/elkapod_teleop/elkapod_ui/elkapod_ui</normaloff>../Elkapod/elkapod_sim_ws/src/elkapod_teleop/elkapod_ui/elkapod_ui</iconset>
   </property>
   <widget class="QWidget" name="central_widget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="13">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="8">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="5">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -144,6 +181,43 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="31">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="8">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="5">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
        <attribute name="title">
         <string>Walk</string>
        </attribute>
@@ -157,10 +231,10 @@
               <active>
                <colorrole role="Window">
                 <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>60</red>
-                  <green>60</green>
-                  <blue>60</blue>
+                 <color alpha="13">
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
                  </color>
                 </brush>
                </colorrole>
@@ -168,10 +242,10 @@
               <inactive>
                <colorrole role="Window">
                 <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>50</red>
-                  <green>50</green>
-                  <blue>50</blue>
+                 <color alpha="8">
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
                  </color>
                 </brush>
                </colorrole>
@@ -179,10 +253,10 @@
               <disabled>
                <colorrole role="Window">
                 <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>60</red>
-                  <green>60</green>
-                  <blue>60</blue>
+                 <color alpha="5">
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
                  </color>
                 </brush>
                </colorrole>
@@ -308,7 +382,7 @@
                           </sizepolicy>
                          </property>
                          <property name="text">
-                          <string>Angle (rad)</string>
+                          <string>Angle</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
@@ -771,43 +845,6 @@
              </item>
              <item>
               <widget class="QWidget" name="horizontalWidget_7" native="true">
-               <property name="palette">
-                <palette>
-                 <active>
-                  <colorrole role="Window">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>60</red>
-                     <green>60</green>
-                     <blue>60</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </active>
-                 <inactive>
-                  <colorrole role="Window">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>50</red>
-                     <green>50</green>
-                     <blue>50</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </inactive>
-                 <disabled>
-                  <colorrole role="Window">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>60</red>
-                     <green>60</green>
-                     <blue>60</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </disabled>
-                </palette>
-               </property>
                <layout class="QHBoxLayout" name="horizontalLayout_12">
                 <property name="topMargin">
                  <number>10</number>
