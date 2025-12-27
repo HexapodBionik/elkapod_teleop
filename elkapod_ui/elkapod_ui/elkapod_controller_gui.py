@@ -1,17 +1,9 @@
 import math
-from enum import Enum
 
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 from .elkapod_controller_ui import Ui_HexapodController
-from .elkapod_gui_node import ElkapodControllerGui, GaitType, SpeedCommand
-
-
-class RobotState(Enum):
-    START = 0
-    INIT = 1
-    IDLE = 2
-    WALKING = 3
+from .elkapod_gui_node import ElkapodControllerGui, GaitType, RobotState, SpeedCommand
 
 
 class ApplicationMainWindow(QMainWindow):
@@ -35,6 +27,14 @@ class ApplicationMainWindow(QMainWindow):
 
         self.node.ros2_qt_bridge.send_async_cmd_signal.connect(
             self._on_transition_result
+        )
+
+        self.node.ros2_qt_bridge.send_state_signal.connect(
+            self._update_button_availability
+        )
+
+        self.node.ros2_qt_bridge.send_battery_lvl_signal.connect(
+            self._update_battery_level
         )
 
         self._ui.angular_vel_slider.sliderMoved.connect(self._update_angular_vel_slider)
@@ -70,7 +70,7 @@ class ApplicationMainWindow(QMainWindow):
         )
         self._ui.gait_selection.currentTextChanged.connect(self._update_gait)
 
-        self._robot_state = RobotState.START
+        self._robot_state = RobotState.INIT
         self._next_state = None
 
         self._speed = SpeedCommand()
@@ -157,7 +157,7 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.transition_status_label.setText("started")
         self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
 
-        if self._robot_state == RobotState.INIT:
+        if self._robot_state == RobotState.IDLE_LOWERED:
             self.node.send_motion_manager_transition("stand_up")
         elif self._robot_state == RobotState.WALKING:
             self.node.send_walk_disable_cmd()
@@ -174,31 +174,37 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.transition_status_label.setText("started")
         self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
 
-        if self._robot_state == RobotState.START:
+        if self._robot_state == RobotState.INIT:
             self.node.send_motion_manager_transition("init")
         elif self._robot_state == RobotState.IDLE:
             self.node.send_motion_manager_transition("lower")
         self._next_state = RobotState.INIT
 
+    def _update_battery_level(self, batery_level: float):
+        batery_level = min(max(batery_level * 100.0, 0.0), 100.0)
+        self._ui.progressBar.setValue(batery_level)
+
+    def _update_button_availability(self, state: RobotState):
+        match state:
+            case RobotState.INIT | RobotState.IDLE_LOWERED:
+                self._ui.idle_transition_button.setEnabled(True)
+                self._ui.init_transition_button.setDisabled(True)
+                self._ui.walk_transition_button.setDisabled(True)
+            case RobotState.IDLE:
+                self._ui.walk_transition_button.setEnabled(True)
+                self._ui.init_transition_button.setEnabled(True)
+                self._ui.idle_transition_button.setDisabled(True)
+                self._ui.Walk.setDisabled(True)
+            case RobotState.WALKING:
+                self._ui.idle_transition_button.setEnabled(True)
+                self._ui.walk_transition_button.setDisabled(True)
+                self._ui.init_transition_button.setDisabled(True)
+                self._ui.Walk.setEnabled(True)
+
     def _on_transition_result(self, result: bool):
         if result:
             self._ui.transition_status_label.setText("success")
             self._ui.transition_status_label.setStyleSheet("color: #88E788")
-            match self._next_state:
-                case RobotState.INIT:
-                    self._ui.idle_transition_button.setEnabled(True)
-                    self._ui.init_transition_button.setDisabled(True)
-                    self._ui.walk_transition_button.setDisabled(True)
-                case RobotState.IDLE:
-                    self._ui.walk_transition_button.setEnabled(True)
-                    self._ui.init_transition_button.setEnabled(True)
-                    self._ui.idle_transition_button.setDisabled(True)
-                    self._ui.Walk.setDisabled(True)
-                case RobotState.WALKING:
-                    self._ui.idle_transition_button.setEnabled(True)
-                    self._ui.walk_transition_button.setDisabled(True)
-                    self._ui.init_transition_button.setDisabled(True)
-                    self._ui.Walk.setEnabled(True)
 
             self._robot_state = self._next_state
             self._next_state = None

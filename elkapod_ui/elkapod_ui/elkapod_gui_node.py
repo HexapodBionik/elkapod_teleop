@@ -1,11 +1,13 @@
 import math
 from enum import Enum
 
+from diagnostic_msgs.msg import DiagnosticArray
 from elkapod_msgs.action import MotionManagerTrigger
 from geometry_msgs.msg import Twist
 from PySide6.QtCore import QObject, Signal
 from rclpy.action import ActionClient
 from rclpy.node import Node
+from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Float64, Int32
 from std_srvs.srv import Trigger
 
@@ -26,8 +28,24 @@ class SpeedCommand:
         return math.sqrt(self.vx**2 + self.vy**2)
 
 
+class RobotState(Enum):
+    INIT = 0
+    IDLE_LOWERED = 1
+    IDLE = 2
+    WALKING = 3
+
+    def to_str(self):
+        return self.name.lower()
+
+    @classmethod
+    def from_str(cls, name: str):
+        return cls[name.upper()]
+
+
 class ROS2QtBridge(QObject):
     send_async_cmd_signal = Signal(bool)
+    send_state_signal = Signal(RobotState)
+    send_battery_lvl_signal = Signal(float)
 
 
 class ElkapodControllerGui(Node):
@@ -56,6 +74,14 @@ class ElkapodControllerGui(Node):
             Trigger, "/motion_manager_walk_disable"
         )
 
+        self._state_sub = self.create_subscription(
+            DiagnosticArray, "/diagnostics", self._diagnostic_callback, 10
+        )
+
+        self._battery_sub = self.create_subscription(
+            BatteryState, "/battery", self._battery_callback, 10
+        )
+
         self._slam_pause_client = self.create_client(Trigger, "/rtabmap/pause")
         self._slam_resume_client = self.create_client(Trigger, "/rtabmap/resume")
         self._slam_restart_client = self.create_client(Trigger, "/rtabmap/reset")
@@ -75,6 +101,18 @@ class ElkapodControllerGui(Node):
         # self.odom_function_handler: function = None
         self._send_goal_future = None
         self.ros2_qt_bridge = ROS2QtBridge()
+
+    def _diagnostic_callback(self, msg: DiagnosticArray):
+        for status in msg.status:
+            if status.name == "ElkapodMotionManager: State":
+                for kv in status.values:
+                    if kv.key == "state":
+                        self.ros2_qt_bridge.send_state_signal.emit(
+                            RobotState.from_str(kv.value)
+                        )
+
+    def _battery_callback(self, msg: BatteryState):
+        self.ros2_qt_bridge.send_battery_lvl_signal.emit(msg.percentage)
 
     def send_gait_type_command(self, gait_type: GaitType):
         msg = Int32()
