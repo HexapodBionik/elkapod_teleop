@@ -21,7 +21,7 @@ def main(args=None):
     window.node = ros_node
     nav_window.node = ros_node
     window.setup()
-    nav_window.setup()
+    # nav_window.setup()
 
     executor = MultiThreadedExecutor()
     executor.add_node(ros_node)

@@ -127,7 +127,7 @@ class NavigationFrame(SectionFrame):
         nav_buttons.addWidget(self.surprise_button)
         self._root_layout.addLayout(nav_buttons)
 
-class MainWindow(QMainWindow):
+class ApplicationNavWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.node: ElkapodControllerGui | None = None
