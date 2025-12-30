@@ -1,123 +1,165 @@
-from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import (
-    QWidget,
-    QLabel
-)
-
-from .elkapod_navigation_ui import Ui_Form
-from .elkapod_gui_node import SpeedCommand, GaitType
 from .elkapod_gui_node import ElkapodControllerGui
+
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QLayout,
+    QFrame, QLabel, QPushButton, QComboBox,
+    QVBoxLayout, QHBoxLayout, QSizePolicy, QGridLayout,
+)
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt
+import sys
 from enum import Enum
 
 
-class NodeStatus(Enum):
-    OFF = 0
-    RUNNING = 1
-    PAUSED = 2
+class SectionFrame(QFrame):
+    class Status(Enum):
+        UNKNOWN = 0
+        RUNNING = 1
+        PAUSED = 2
 
-
-class ApplicationNavWindow(QWidget):
-    MAPPING = "MAPPING"
-    LOCALIZATION = "LOCALIZATION"
-
-    # odom_info_update = Signal(str)
-
-    def __init__(self, parent=None):
-        self.node: ElkapodControllerGui = None
+    def __init__(self, title: str, parent=None, data_box: bool = True):
         super().__init__(parent)
-        self._ui = Ui_Form()
-        self._ui.setupUi(self)
+        self.setFrameShape(QFrame.Box)
+        self.setLineWidth(1)
+        self.status = self.Status.UNKNOWN
 
-        self.odom_status: NodeStatus = None
-        self.slam_status: NodeStatus = None
+        self._root_layout = QVBoxLayout(self)
 
-        # self.odom_info_update.connect(self.on_label_update)
 
-    def setup(self):
-        self.update_status_label(self._ui.slam_status, NodeStatus.OFF)
-        self._ui.slam_mode_combo.addItems([self.MAPPING, self.LOCALIZATION])
-        self._ui.slam_mode_combo.currentTextChanged.connect(
-            self._update_slam_mode)
+        top_layout = QGridLayout()
+        top_layout.setVerticalSpacing(15)
+        title_label = QLabel(title)
+        title_label.setStyleSheet("""
+            font-size: 15pt;
+            font-weight: bold;
+        """)
 
-        self._ui.slam_resume.pressed.connect(self._resume_slam)
-        self._ui.slam_pause.pressed.connect(self._pause_slam)
-        self._ui.slam_restart.pressed.connect(self._restart_slam)
+        self.status_layout = QHBoxLayout()
 
-        self.update_status_label(self._ui.odom_status, NodeStatus.OFF)
-        self._ui.odom_resume.pressed.connect(self._resume_odom)
-        self._ui.odom_pause.pressed.connect(self._pause_odom)
-        self._ui.odom_restart.pressed.connect(self._restart_odom)
-        # print(self.node.odom_function_handler)
-        # self.node.register_callback_handler(
-        #     self.node.odom_function_handler, self.set_label_text_threadsafe)
+        status_label = QLabel("Status: ")
+        status_label.setSizePolicy(
+            QSizePolicy.Policy.Maximum,
+            QSizePolicy.Policy.Preferred
+        )
+        self.status_label = QLabel(self.status.name)
+        self.status_layout.addWidget(status_label, 0)
+        self.status_layout.addWidget(self.status_label, 0, Qt.AlignmentFlag.AlignLeft)
+        self.status_layout.setSpacing(0)
 
-    @staticmethod
-    def update_status_label(label: QLabel, new_status: NodeStatus):
-        label.setText(new_status.name)
-        match new_status:
-            case NodeStatus.OFF:
-                label.setStyleSheet("color: #BF0E34")
-            case NodeStatus.RUNNING:
-                label.setStyleSheet("color: #0EBF67")
-            case NodeStatus.PAUSED:
-                label.setStyleSheet("color: #EAD765")
+        if data_box:
+            self.data_box = QLabel("Lorem ipsum")
+            self.data_box.setAlignment(Qt.AlignCenter)
+            self.data_box.setFrameShape(QFrame.Box)
+            top_layout.addWidget(self.data_box, 0, 1, 1, 2)
 
-    def _update_slam_mode(self, mode: str):
-        match mode:
-            case self.LOCALIZATION:
-                self.node.send_slam_localization_cmd()
-            case self.MAPPING:
-                self.node.send_slam_mapping_cmd()
-            case _:
-                print(f"Something failed time to die, got {mode}")
+        top_layout.addWidget(title_label, 0, 0)
+        top_layout.addLayout(self.status_layout, 1, 0)
+        self._root_layout.addLayout(top_layout)
+        self._root_layout.addSpacing(10)
 
-    def _resume_slam(self):
-        if self.slam_status == NodeStatus.RUNNING:
-            return
-        else:
-            self.update_status_label(self._ui.slam_status, NodeStatus.RUNNING)
-            self.node.send_slam_resume_cmd()
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Maximum
+        )
 
-    def _pause_slam(self):
-        if self.slam_status == NodeStatus.PAUSED:
-            return
-        else:
-            self.update_status_label(self._ui.slam_status, NodeStatus.PAUSED)
-            self.node.send_slam_pause_cmd()
 
-    def _restart_slam(self):
-        if self.slam_status == NodeStatus.OFF:
-            return
-        else:
-            self.update_status_label(self._ui.slam_status, NodeStatus.RUNNING)
-            self.node.send_slam_restart_cmd()
 
-    def _resume_odom(self):
-        if self.odom_status == NodeStatus.RUNNING:
-            return
-        else:
-            self.update_status_label(self._ui.odom_status, NodeStatus.RUNNING)
-            self.node.send_odom_resume_cmd()
+class OdometryFrame(SectionFrame):
+    def __init__(self, parent=None):
+        super().__init__("Odometry", parent)
 
-    def _pause_odom(self):
-        if self.odom_status == NodeStatus.PAUSED:
-            return
-        else:
-            self.update_status_label(self._ui.odom_status, NodeStatus.PAUSED)
-            self.node.send_odom_pause_cmd()
+        odom_buttons = QHBoxLayout()
+        odom_buttons.setSpacing(7)
+        self.start_button = QPushButton("START", parent=self)
+        self.pause_button = QPushButton("PAUSE", parent=self)
+        self.restart_button = QPushButton("RESTART", parent=self)
+        odom_buttons.addWidget(self.start_button)
+        odom_buttons.addWidget(self.pause_button)
+        odom_buttons.addWidget(self.restart_button)
 
-    def _restart_odom(self):
-        if self.odom_status == NodeStatus.OFF:
-            return
-        else:
-            self.update_status_label(self._ui.odom_status, NodeStatus.RUNNING)
-            self.node.send_odom_restart_cmd()
+        self._root_layout.addLayout(odom_buttons)
 
-    # @Slot(str)
-    # def on_label_update(self, text):
-    #     self._ui.odomInfo.setText(text)
+class SLAMFrame(SectionFrame):
+    def __init__(self, parent=None):
+        super().__init__("SLAM", parent)
 
-    # def set_label_text_threadsafe(self, text):
-    #     """Can be safely called from ROS callbacks"""
-    #     print(text)
-    #     self.odom_info_update.emit(text)
+
+        slam_buttons = QHBoxLayout()
+        slam_buttons.setSpacing(7)
+        self.start_button = QPushButton("START")
+        self.pause_button = QPushButton("PAUSE")
+        self.restart_button = QPushButton("RESTART")
+
+        slam_buttons.addWidget(self.start_button)
+        slam_buttons.addWidget(self.pause_button)
+        slam_buttons.addWidget(self.restart_button)
+
+        control_layout = QHBoxLayout()
+        control_layout.setSpacing(7)
+        node_mode_layout = QHBoxLayout()
+        node_mode_layout.addWidget(QLabel("Mode:"))
+
+        self.slam_mode = QComboBox()
+        self.slam_mode.addItems(["SLAM", "Localization"])
+        node_mode_layout.addWidget(self.slam_mode)
+
+        control_layout.addLayout(node_mode_layout)
+
+        self.republish_map_button = QPushButton("Republish Map")
+        self.new_map_button = QPushButton("New Map")
+
+        control_layout.addWidget(self.republish_map_button)
+        control_layout.addWidget(self.new_map_button)
+
+        self._root_layout.addLayout(slam_buttons)
+        self._root_layout.addSpacing(7)
+        self._root_layout.addLayout(control_layout)
+
+class NavigationFrame(SectionFrame):
+    def __init__(self, parent=None):
+        super().__init__("Navigation", parent)
+        nav_buttons = QHBoxLayout()
+        nav_buttons.setSpacing(7)
+        self.abort_button = QPushButton("ABORT")
+        self.surprise_button = QPushButton("SURPRISE")
+
+        nav_buttons.addWidget(self.abort_button)
+        nav_buttons.addWidget(self.surprise_button)
+        self._root_layout.addLayout(nav_buttons)
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.node: ElkapodControllerGui | None = None
+        self.setWindowTitle("Navigation UI")
+        self.resize(900, 700)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        root_layout = QHBoxLayout(central_widget)
+        root_layout.setSpacing(22)
+
+        left_panel = QVBoxLayout()
+
+        root_layout.addLayout(left_panel, 1)
+
+        self.odom_frame = OdometryFrame(central_widget)
+        left_panel.addWidget(self.odom_frame)
+
+        self.slam_frame = SLAMFrame(central_widget)
+        left_panel.addWidget(self.slam_frame)
+
+        self.nav_frame = NavigationFrame(central_widget)
+        left_panel.addWidget(self.nav_frame)
+        right_frame = QFrame()
+        right_frame.setFrameShape(QFrame.Box)
+        right_layout = QVBoxLayout(right_frame)
+
+        self.right_data = QLabel("Utils data or something")
+        self.right_data.setAlignment(Qt.AlignCenter)
+        right_layout.addWidget(self.right_data)
+
+        root_layout.addWidget(right_frame, 1)
+        left_panel.addStretch()
+

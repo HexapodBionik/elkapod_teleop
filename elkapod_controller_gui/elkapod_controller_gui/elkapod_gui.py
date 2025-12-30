@@ -32,8 +32,8 @@ def main(args=None):
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     try:
-        # window.move(100, 100)
-        # nav_window.move(800, 100)
+        window.move(100, 100)
+        nav_window.move(800, 100)
         window.show()
         nav_window.show()
         sys.exit(app.exec())
