@@ -61,7 +61,8 @@ class SectionFrame(QFrame):
             QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Maximum
         )
-
+    def update_data_box(self,text:str):
+        self.data_box.setText(text)
 
 
 class OdometryFrame(SectionFrame):
@@ -78,6 +79,7 @@ class OdometryFrame(SectionFrame):
         odom_buttons.addWidget(self.restart_button)
 
         self._root_layout.addLayout(odom_buttons)
+    
 
 class SLAMFrame(SectionFrame):
     def __init__(self, parent=None):
@@ -128,9 +130,11 @@ class NavigationFrame(SectionFrame):
         self._root_layout.addLayout(nav_buttons)
 
 class ApplicationNavWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, node: ElkapodControllerGui | None  = None):
         super().__init__()
-        self.node: ElkapodControllerGui | None = None
+   
+        self.node = node
+
         self.setWindowTitle("Navigation UI")
         self.resize(900, 700)
 
@@ -156,10 +160,13 @@ class ApplicationNavWindow(QMainWindow):
         right_frame.setFrameShape(QFrame.Box)
         right_layout = QVBoxLayout(right_frame)
 
-        self.right_data = QLabel("Utils data or something")
+        self.right_data = QLabel("")
         self.right_data.setAlignment(Qt.AlignCenter)
         right_layout.addWidget(self.right_data)
 
         root_layout.addWidget(right_frame, 1)
         left_panel.addStretch()
 
+        if node is not None:
+            self.node.ros2_qt_bridge.odometry_received_signal.connect(self.odom_frame.update_data_box)
+            
