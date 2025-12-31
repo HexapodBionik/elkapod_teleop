@@ -25,22 +25,14 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.idle_transition_button.pressed.connect(self._send_idle_transition)
         self._ui.walk_transition_button.pressed.connect(self._send_walk_transition)
 
-        self.node.ros2_qt_bridge.send_async_cmd_signal.connect(
-            self._on_transition_result
-        )
+        self.node.ros2_qt_bridge.send_async_cmd_signal.connect(self._on_transition_result)
 
-        self.node.ros2_qt_bridge.send_state_signal.connect(
-            self._update_button_availability
-        )
+        self.node.ros2_qt_bridge.send_state_signal.connect(self._update_button_availability)
 
-        self.node.ros2_qt_bridge.send_battery_lvl_signal.connect(
-            self._update_battery_level
-        )
+        self.node.ros2_qt_bridge.send_battery_lvl_signal.connect(self._update_battery_level)
 
         self._ui.angular_vel_slider.sliderMoved.connect(self._update_angular_vel_slider)
-        self._ui.angular_vel_spinbox.valueChanged.connect(
-            self._update_angular_vel_spinbox
-        )
+        self._ui.angular_vel_spinbox.valueChanged.connect(self._update_angular_vel_spinbox)
         self._ui.angular_vel_stopbutton.pressed.connect(self._update_angular_vel_button)
 
         self._ui.roll_slider.sliderMoved.connect(self._update_roll_slider)
@@ -52,12 +44,8 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.pitch_reset_button.pressed.connect(self._update_pitch_button)
 
         self._ui.base_height_slider.sliderMoved.connect(self._update_base_height_slider)
-        self._ui.base_height_spinbox.valueChanged.connect(
-            self._update_base_height_spinbox
-        )
-        self._ui.base_height_default_button.pressed.connect(
-            self._update_base_height_button
-        )
+        self._ui.base_height_spinbox.valueChanged.connect(self._update_base_height_spinbox)
+        self._ui.base_height_default_button.pressed.connect(self._update_base_height_button)
 
         self._ui.actionAbout.triggered.connect(self._show_about_message)
 
@@ -71,7 +59,6 @@ class ApplicationMainWindow(QMainWindow):
         self._ui.gait_selection.currentTextChanged.connect(self._update_gait)
 
         self._robot_state = RobotState.INIT
-        self._next_state = None
 
         self._speed = SpeedCommand()
         self._current_max_speed = 0.2
@@ -161,14 +148,12 @@ class ApplicationMainWindow(QMainWindow):
             self.node.send_motion_manager_transition("stand_up")
         elif self._robot_state == RobotState.WALKING:
             self.node.send_walk_disable_cmd()
-        self._next_state = RobotState.IDLE
 
     def _send_walk_transition(self):
         self._ui.transition_status_label.setText("started")
         self._ui.transition_status_label.setStyleSheet("color: #FBEC5D")
 
         self.node.send_walk_enable_cmd()
-        self._next_state = RobotState.WALKING
 
     def _send_init_transition(self):
         self._ui.transition_status_label.setText("started")
@@ -178,18 +163,24 @@ class ApplicationMainWindow(QMainWindow):
             self.node.send_motion_manager_transition("init")
         elif self._robot_state == RobotState.IDLE:
             self.node.send_motion_manager_transition("lower")
-        self._next_state = RobotState.INIT
 
     def _update_battery_level(self, batery_level: float):
         batery_level = min(max(batery_level * 100.0, 0.0), 100.0)
         self._ui.progressBar.setValue(batery_level)
 
     def _update_button_availability(self, state: RobotState):
+        self._robot_state = state
         match state:
-            case RobotState.INIT | RobotState.IDLE_LOWERED:
+            case RobotState.INIT:
+                self._ui.idle_transition_button.setDisabled(True)
+                self._ui.init_transition_button.setEnabled(True)
+                self._ui.walk_transition_button.setDisabled(True)
+                self._ui.Walk.setDisabled(True)
+            case RobotState.IDLE_LOWERED:
                 self._ui.idle_transition_button.setEnabled(True)
                 self._ui.init_transition_button.setDisabled(True)
                 self._ui.walk_transition_button.setDisabled(True)
+                self._ui.Walk.setDisabled(True)
             case RobotState.IDLE:
                 self._ui.walk_transition_button.setEnabled(True)
                 self._ui.init_transition_button.setEnabled(True)
@@ -205,11 +196,7 @@ class ApplicationMainWindow(QMainWindow):
         if result:
             self._ui.transition_status_label.setText("success")
             self._ui.transition_status_label.setStyleSheet("color: #88E788")
-
-            self._robot_state = self._next_state
-            self._next_state = None
         else:
-            self._next_state = None
             self._ui.transition_status_label.setText("failed")
             self._ui.transition_status_label.setStyleSheet("color: #DA2C43")
 
