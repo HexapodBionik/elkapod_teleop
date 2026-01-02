@@ -2,12 +2,15 @@ from enum import Enum
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64, Int32
-from std_srvs.srv import Trigger
+from std_srvs.srv import Trigger, Empty
 from nav_msgs.msg import Odometry
 from elkapod_msgs.action import MotionManagerTrigger
 from rclpy.action import ActionClient
 from PySide6.QtCore import QObject, Signal
 from tf_transformations import euler_from_quaternion
+from nav2_simple_commander.robot_navigator import BasicNavigator
+from rtabmap_msgs.msg import Info
+from rtabmap_msgs.srv import PublishMap
 import math
 
 
@@ -30,15 +33,21 @@ class SpeedCommand:
 class ROS2QtBridge(QObject):
     send_async_cmd_signal = Signal(bool)
     odometry_received_signal = Signal(str)
+    map_info_received_signal = Signal(str)
 
 
 class ElkapodControllerGui(Node):
     def __init__(self):
         super().__init__("ElkapodControllerGui")
-
+        self._last_emit_time = 0.0
+        self._emit_period = 0.2
         self.declare_parameter("odom_topic", "/icp_odom")
-        
+        self.declare_parameter("map_info_topic", "/info")
+
+        # self.nav_commander = BasicNavigator(namespace='/navigation')
+
         odom_topic = self.get_parameter("odom_topic").value
+        map_info_topic = self.get_parameter("map_info_topic").value
         self._cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self._cmd_gait_type_publisher = self.create_publisher(
             Int32, "/cmd_gait_type", 10)
@@ -55,8 +64,23 @@ class ElkapodControllerGui(Node):
         self._motion_manager_walk_disable_client = self.create_client(
             Trigger, "/motion_manager_walk_disable")
 
-        self._odom_subscriber = self.create_subscription(Odometry,odom_topic,self._odometry_callback,10)
+        self.odom_subscriber = self.create_subscription(Odometry,odom_topic,self._odometry_callback,10)
+        self.map_info_subscriber = self.create_subscription(Info, map_info_topic, self._map_info_callback,10)
 
+        self.resume_odom_client = self.create_client(Empty, "/resume_odom")
+        self.pause_odom_client = self.create_client(Empty, "/pause_odom")
+        self.reset_odom_client = self.create_client(Empty, "/reset_odom")
+
+        self.pause_slam_client = self.create_client(Empty, "/rtabmap/pause")
+        self.resume_slam_client = self.create_client(Empty, "/rtabmap/resume")
+        self.reset_slam_client = self.create_client(Empty, "/rtabmap/reset")
+
+        self.set_mode_localization_client = self.create_client(Empty, "/rtabmap/set_mode_localization")
+        self.set_mode_mapping_client = self.create_client(Empty, "/rtabmap/set_mode_mapping")
+
+        self.publish_map_client = self.create_client(PublishMap, "/rtabmap/publish_map")
+        self.create_new_map_client = self.create_client(Empty, "/rtabmap/trigger_new_map")
+        
         self._send_goal_future = None
         self.ros2_qt_bridge = ROS2QtBridge()
 
@@ -158,103 +182,141 @@ class ElkapodControllerGui(Node):
             self._send_goal_future.add_done_callback(
                 self._service_done_callback)
 
-    def send_slam_pause_cmd(self):
-        result = self._slam_pause_client.wait_for_service(timeout_sec=5.0)
-        if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
-        else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._slam_pause_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
-
-    def send_slam_resume_cmd(self):
-        result = self._slam_resume_client.wait_for_service(timeout_sec=5.0)
-        if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
-        else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._slam_resume_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
-
-    def send_slam_restart_cmd(self):
-        result = self._slam_restart_client.wait_for_service(timeout_sec=5.0)
-        if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
-        else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._slam_restart_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
-
     def send_odom_pause_cmd(self):
-        result = self._odom_pause_client.wait_for_service(timeout_sec=5.0)
+        result = self.pause_odom_client.wait_for_service(timeout_sec=3.0)
         if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for odom pause service")
         else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._odom_pause_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            goal = Empty.Request()
+            self._send_goal_future = self.pause_odom_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
     def send_odom_resume_cmd(self):
-        result = self._odom_resume_client.wait_for_service(timeout_sec=5.0)
+        result = self.resume_odom_client.wait_for_service(timeout_sec=3.0)
         if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for odom resume service")
         else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._odom_resume_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            goal = Empty.Request()
+            self._send_goal_future = self.resume_odom_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
     def send_odom_restart_cmd(self):
-        result = self._odom_restart_client.wait_for_service(timeout_sec=5.0)
+        result = self.reset_odom_client.wait_for_service(timeout_sec=3.0)
         if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for odom reset service")
         else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._odom_restart_client.call_async(goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            goal = Empty.Request()
+            self._send_goal_future = self.reset_odom_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
-    def send_slam_mapping_cmd(self):
-        result = self._slam_set_mapping_client.wait_for_service(
-            timeout_sec=5.0)
+    def send_slam_pause_cmd(self):
+        result = self.pause_slam_client.wait_for_service(timeout_sec=3.0)
         if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for slam pause service")
         else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_mapping_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            goal = Empty.Request()
+            self._send_goal_future = self.pause_slam_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
-    def send_slam_localization_cmd(self):
-        result = self._slam_set_localization_client.wait_for_service(
-            timeout_sec=5.0)
+    def send_slam_resume_cmd(self):
+        result = self.resume_slam_client.wait_for_service(timeout_sec=3.0)
         if not result:
-            self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for slam resume service")
         else:
-            goal = Trigger.Request()
-            self._send_goal_future = self._slam_set_localization_client.call_async(
-                goal)
-            self._send_goal_future.add_done_callback(
-                self._service_done_callback)
+            goal = Empty.Request()
+            self._send_goal_future = self.resume_slam_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
+    def send_slam_restart_cmd(self):
+        result = self.reset_slam_client.wait_for_service(timeout_sec=3.0)
+        if not result:
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for slam reset service")
+        else:
+            goal = Empty.Request()
+            self._send_goal_future = self.reset_slam_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
+
+    def send_slam_mapping_mode_cmd(self):
+        result = self.set_mode_mapping_client.wait_for_service(timeout_sec=3.0)
+        if not result:
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for slam mode service")
+        else:
+            goal = Empty.Request()
+            self._send_goal_future = self.set_mode_mapping_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
+
+    def send_slam_localization_mode_cmd(self):
+        result = self.set_mode_localization_client.wait_for_service(timeout_sec=3.0)
+        if not result:
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for slam mode service")
+        else:
+            goal = Empty.Request()
+            self._send_goal_future = self.set_mode_localization_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
+
+
+    def send_publish_map_cmd(self):
+        result = self.publish_map_client.wait_for_service(timeout_sec=3.0)
+        if not result:
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for publish map service")
+        else:
+            goal = PublishMap.Request()
+            goal.global_map = True
+            goal.optimized = True
+            goal.graph_only = False
+            self._send_goal_future = self.publish_map_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
+
+    def send_new_map_cmd(self):
+        result = self.create_new_map_client.wait_for_service(timeout_sec=3.0)
+        if not result:
+            # self.ros2_qt_bridge.send_async_cmd_signal.emit(False)
+            print("Failed accessing for create mew map service")
+        else:
+            goal = Empty.Request()
+            self._send_goal_future = self.create_new_map_client.call_async(goal)
+#            self._send_goal_future.add_done_callback(
+#                self._service_done_callback)
 
     def _odometry_callback(self, msg:Odometry):
-        timestamp = msg.header.stamp.nanosec
+        timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        if timestamp - self._last_emit_time < self._emit_period:
+            return
+        self._last_emit_time = timestamp
+
         x = msg.pose.pose.position.x
         y = msg.pose.pose.position.y
+
         q = msg.pose.pose.orientation
-        (quat_x, quat_y, quat_z, quat_w) = (q.x, q.y, q.z, q.w)
-        _, _, yaw = euler_from_quaternion(
-            [quat_x, quat_y, quat_z, quat_w]
-)
-        #                                                    theta
-        data = f"[{timestamp/(10**7)}] x: {x:.3}, y: {y:.3}, \u03b8: {yaw:.3}"
-        print(f"{timestamp}, {x}, {y}, {yaw}")
+        yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])[2]
+        
+        #                                                  theta
+        data = f"[{timestamp:.2f}] x: {x:.2f}, y: {y:.2f}, \u03b8: {yaw:.2f}"
         self.ros2_qt_bridge.odometry_received_signal.emit(data)
 
 
+    def _map_info_callback(self, msg:Info):
+        stats = dict(zip(msg.stats_keys, msg.stats_values))
+        wm_size = stats.get('Memory/Working_memory_size/', -1)
+        distance_travelled = stats.get('Memory/Distance_travelled/m', None)
+        
+        data = f"Nodes {wm_size}, travelled {distance_travelled:.2f}m"
+        self.ros2_qt_bridge.map_info_received_signal.emit(data)
