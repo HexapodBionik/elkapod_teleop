@@ -36,7 +36,6 @@ ros2 run elkapod_controller_gui elkapod_controller_gui
 ```
 **Elkapod Control Panel Layout**  
 ![binding](doc/images/elkapod_gui_overview.png)
-<<<<<<< HEAD
 
 1. **Init** window controls transition between robot states. After startup robot has to be initialized with **Init** button.
 2. In next step robot has to stand up and for this task you should use **Idle** button. 
@@ -65,19 +64,3 @@ ros2 launch elkapod_teleop_joy elkapod_joy_controller.launch.py gamepad_model:='
 
 ### Credits
 Binding template created by Goldwolf & Shoadow.
-=======
-
-1. **Init** window controls transition between robot states. After startup robot has to be initialized with **Init** button.
-2. In next step robot has to stand up and for this task you should use **Idle** button. 
-3. Finally in order to activate the controller use **Walk button**. 
-
-![binding](doc/images/elkapod_gui_overview_2.png)
-
-
-## Elkapod Control using joystick controller
-> [!IMPORTANT] 
->
-> In development
->
->
->>>>>>> 3552c74 (Elkapod GUI v1.0.0 finished)

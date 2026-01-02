@@ -244,7 +244,9 @@ class NavigationFrame(SectionFrame):
 
 
     def _abort(self):
-        print("Aborting task")
+        self.node.abort_task()
+        # print("Aborting task")
+
 
     def _surprise(self):
         print("Looking for a surprise")

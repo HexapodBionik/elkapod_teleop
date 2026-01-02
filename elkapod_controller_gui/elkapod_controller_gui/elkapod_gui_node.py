@@ -8,9 +8,11 @@ from elkapod_msgs.action import MotionManagerTrigger
 from rclpy.action import ActionClient
 from PySide6.QtCore import QObject, Signal
 from tf_transformations import euler_from_quaternion
-from nav2_simple_commander.robot_navigator import BasicNavigator
+# from nav2_simple_commander.robot_navigator import BasicNavi   ator
 from rtabmap_msgs.msg import Info
 from rtabmap_msgs.srv import PublishMap
+from nav2_msgs.action import NavigateToPose
+from action_msgs.srv import CancelGoal
 import math
 
 
@@ -81,6 +83,8 @@ class ElkapodControllerGui(Node):
         self.publish_map_client = self.create_client(PublishMap, "/rtabmap/publish_map")
         self.create_new_map_client = self.create_client(Empty, "/rtabmap/trigger_new_map")
         
+        self._cancel_client = self.create_client(
+            CancelGoal, '/navigation/navigate_to_pose/_action/cancel_goal')
         self._send_goal_future = None
         self.ros2_qt_bridge = ROS2QtBridge()
 
@@ -320,3 +324,25 @@ class ElkapodControllerGui(Node):
         
         data = f"Nodes {wm_size}, travelled {distance_travelled:.2f}m"
         self.ros2_qt_bridge.map_info_received_signal.emit(data)
+
+    def abort_task(self):
+        """Call this on button click"""
+        if not self._cancel_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error("Nav2 Cancel Service not available!")
+            return
+
+        request = CancelGoal.Request()
+        self.get_logger().info("Sending Kill Signal to Nav2...")
+        future = self._cancel_client.call_async(request)
+        future.add_done_callback(self._cancel_callback)
+
+    def _cancel_callback(self, future):
+        try:
+            response = future.result()
+
+            if len(response.goals_canceling) > 0:
+                self.get_logger().info(f"Success! Canceling {len(response.goals_canceling)} goals.")
+            else:
+                self.get_logger().warn("No active goals found to cancel.")
+        except Exception as e:
+            self.get_logger().error(f"Service call failed: {e}")
