@@ -125,20 +125,20 @@ class ApplicationMainWindow(QMainWindow):
         self.node.send_pitch_command(0.0)
 
     def _update_base_height_slider(self, height: str):
-        base_height = 0.09 + (float(height) / 100.0) * 0.07
+        base_height = 0.146 + (float(height) / 100.0) * 0.07
         self._ui.base_height_spinbox.setValue(base_height)
         self.node.send_base_height_command(base_height)
 
     def _update_base_height_spinbox(self, height: str):
         base_height = float(height)
-        slider_value = (base_height - 0.09) / 0.07 * 100.0
+        slider_value = (base_height - 0.146) / 0.07 * 100.0
         self._ui.base_height_slider.setValue(slider_value)
         self.node.send_base_height_command(base_height)
 
     def _update_base_height_button(self):
         self._ui.base_height_slider.setValue(43)
-        self._ui.base_height_spinbox.setValue(0.12)
-        self.node.send_base_height_command(0.12)
+        self._ui.base_height_spinbox.setValue(0.166)
+        self.node.send_base_height_command(0.166)
 
     def _send_idle_transition(self):
         self._ui.transition_status_label.setText("started")
@@ -165,7 +165,7 @@ class ApplicationMainWindow(QMainWindow):
             self.node.send_motion_manager_transition("lower")
 
     def _update_battery_level(self, batery_level: float):
-        batery_level = min(max(batery_level * 100.0, 0.0), 100.0)
+        batery_level = min(max(batery_level, 0.0), 100.0)
         self._ui.progressBar.setValue(batery_level)
 
     def _update_button_availability(self, state: RobotState):

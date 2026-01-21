@@ -1,12 +1,12 @@
 import rclpy
-from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
-from sensor_msgs.msg import JoyFeedback
 from elkapod_msgs.srv import (
     GenerateFeedback,
     GenerateFeedback_Request,
     GenerateFeedback_Response,
 )
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
+from sensor_msgs.msg import JoyFeedback
 
 
 class ElkapodJoyFeedbackNode(Node):
@@ -14,9 +14,7 @@ class ElkapodJoyFeedbackNode(Node):
         super().__init__("elkapod_joy_feedback_node")
         self._feedback_generated_flag = False
 
-        self._joy_feedback_pub = self.create_publisher(
-            JoyFeedback, "/joy/set_feedback", 10
-        )
+        self._joy_feedback_pub = self.create_publisher(JoyFeedback, "/joy/set_feedback", 10)
 
         self._init_time = self.get_clock().now()
         self._duration = 0.0
@@ -27,14 +25,10 @@ class ElkapodJoyFeedbackNode(Node):
             "/joy_generate_feedback",
             self._start_generator_callback,
         )
-        self._feedback_timer = self.create_timer(
-            0.1, self._feedback_timer_callback
-        )  # 10 Hz
+        self._feedback_timer = self.create_timer(0.1, self._feedback_timer_callback)  # 10 Hz
         self.get_logger().info("Feedback controller node started!")
 
-    def _start_generator_callback(
-        self, request: GenerateFeedback_Request, response: GenerateFeedback_Response
-    ):
+    def _start_generator_callback(self, request: GenerateFeedback_Request, response: GenerateFeedback_Response):
         if not self._feedback_generated_flag:
             self._duration = request.duration
             self._intensivity = request.intensivity

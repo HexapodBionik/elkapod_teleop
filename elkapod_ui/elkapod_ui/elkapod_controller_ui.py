@@ -87,9 +87,7 @@ class Ui_HexapodController(object):
 
         self.horizontalLayout_8.addWidget(self.transition_status_label)
 
-        self.horizontalSpacer = QSpacerItem(
-            40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
-        )
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_8.addItem(self.horizontalSpacer)
 
@@ -122,9 +120,7 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_14.addLayout(self.verticalLayout_6)
 
-        self.verticalSpacer_11 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_14.addItem(self.verticalSpacer_11)
 
@@ -168,9 +164,7 @@ class Ui_HexapodController(object):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.velocity_control_widget.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.velocity_control_widget.sizePolicy().hasHeightForWidth())
         self.velocity_control_widget.setSizePolicy(sizePolicy)
         self.horizontalLayout_4 = QHBoxLayout(self.velocity_control_widget)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -187,9 +181,7 @@ class Ui_HexapodController(object):
 
         self.velocity_direction.addWidget(self.velocity_dir_title)
 
-        self.verticalSpacer_6 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.velocity_direction.addItem(self.verticalSpacer_6)
 
@@ -229,9 +221,7 @@ class Ui_HexapodController(object):
 
         self.velocity_direction.addLayout(self.horizontalLayout_2)
 
-        self.verticalSpacer_5 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.velocity_direction.addItem(self.verticalSpacer_5)
 
@@ -249,9 +239,7 @@ class Ui_HexapodController(object):
 
         self.velocity_value.addWidget(self.velocity_value_title)
 
-        self.verticalSpacer_7 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_7 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.velocity_value.addItem(self.verticalSpacer_7)
 
@@ -292,9 +280,7 @@ class Ui_HexapodController(object):
 
         self.velocity_value.addLayout(self.horizontalLayout)
 
-        self.verticalSpacer_8 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.velocity_value.addItem(self.verticalSpacer_8)
 
@@ -312,9 +298,7 @@ class Ui_HexapodController(object):
 
         self.angular_velocity.addWidget(self.angular_vel_title)
 
-        self.verticalSpacer_9 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.angular_velocity.addItem(self.verticalSpacer_9)
 
@@ -351,9 +335,7 @@ class Ui_HexapodController(object):
 
         self.angular_velocity.addLayout(self.horizontalLayout_11)
 
-        self.verticalSpacer_12 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_12 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.angular_velocity.addItem(self.verticalSpacer_12)
 
@@ -376,9 +358,7 @@ class Ui_HexapodController(object):
         self.battery_lvl_widget_2.setAutoFillBackground(True)
         self.battery_lvl_widget = QVBoxLayout(self.battery_lvl_widget_2)
         self.battery_lvl_widget.setObjectName("battery_lvl_widget")
-        self.verticalSpacer_13 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_13 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.battery_lvl_widget.addItem(self.verticalSpacer_13)
 
@@ -395,9 +375,7 @@ class Ui_HexapodController(object):
 
         self.battery_lvl_widget.addWidget(self.progressBar)
 
-        self.verticalSpacer_4 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.battery_lvl_widget.addItem(self.verticalSpacer_4)
 
@@ -408,9 +386,7 @@ class Ui_HexapodController(object):
         self.gait_type_widget_2.setAutoFillBackground(True)
         self.gait_type_widget = QVBoxLayout(self.gait_type_widget_2)
         self.gait_type_widget.setObjectName("gait_type_widget")
-        self.verticalSpacer_14 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_14 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.gait_type_widget.addItem(self.verticalSpacer_14)
 
@@ -426,9 +402,7 @@ class Ui_HexapodController(object):
 
         self.gait_type_widget.addWidget(self.gait_selection)
 
-        self.verticalSpacer_15 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_15 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.gait_type_widget.addItem(self.verticalSpacer_15)
 
@@ -475,9 +449,7 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_10.addWidget(self.label_3)
 
-        self.verticalSpacer = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_10.addItem(self.verticalSpacer)
 
@@ -526,9 +498,7 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_7.addWidget(self.label_4)
 
-        self.verticalSpacer_2 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_7.addItem(self.verticalSpacer_2)
 
@@ -577,9 +547,7 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_4.addWidget(self.label_5)
 
-        self.verticalSpacer_3 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_3)
 
@@ -601,10 +569,10 @@ class Ui_HexapodController(object):
         self.base_height_spinbox = QDoubleSpinBox(self.verticalWidget_21)
         self.base_height_spinbox.setObjectName("base_height_spinbox")
         self.base_height_spinbox.setDecimals(3)
-        self.base_height_spinbox.setMinimum(0.090000000000000)
-        self.base_height_spinbox.setMaximum(0.160000000000000)
+        self.base_height_spinbox.setMinimum(0.146)
+        self.base_height_spinbox.setMaximum(0.216)
         self.base_height_spinbox.setSingleStep(0.001000000000000)
-        self.base_height_spinbox.setValue(0.120000000000000)
+        self.base_height_spinbox.setValue(0.166)
 
         self.verticalLayout_11.addWidget(self.base_height_spinbox)
 
@@ -629,9 +597,7 @@ class Ui_HexapodController(object):
 
         self.verticalLayout_2.addWidget(self.tabWidget)
 
-        self.verticalSpacer_10 = QSpacerItem(
-            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
-        )
+        self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_10)
 
@@ -656,90 +622,44 @@ class Ui_HexapodController(object):
     # setupUi
 
     def retranslateUi(self, HexapodController):
-        HexapodController.setWindowTitle(
-            QCoreApplication.translate("HexapodController", "Elkapod Control ", None)
-        )
-        self.actionAbout.setText(
-            QCoreApplication.translate("HexapodController", "About", None)
-        )
+        HexapodController.setWindowTitle(QCoreApplication.translate("HexapodController", "Elkapod Control ", None))
+        self.actionAbout.setText(QCoreApplication.translate("HexapodController", "About", None))
         self.transition_status_title.setText(
             QCoreApplication.translate("HexapodController", "Transition status:", None)
         )
-        self.transition_status_label.setText(
-            QCoreApplication.translate("HexapodController", "none", None)
-        )
-        self.init_transition_button.setText(
-            QCoreApplication.translate("HexapodController", "Init", None)
-        )
-        self.idle_transition_button.setText(
-            QCoreApplication.translate("HexapodController", "Idle", None)
-        )
-        self.walk_transition_button.setText(
-            QCoreApplication.translate("HexapodController", "Walk", None)
-        )
+        self.transition_status_label.setText(QCoreApplication.translate("HexapodController", "none", None))
+        self.init_transition_button.setText(QCoreApplication.translate("HexapodController", "Init", None))
+        self.idle_transition_button.setText(QCoreApplication.translate("HexapodController", "Idle", None))
+        self.walk_transition_button.setText(QCoreApplication.translate("HexapodController", "Walk", None))
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.Init),
             QCoreApplication.translate("HexapodController", "Init", None),
         )
-        self.label_8.setText(
-            QCoreApplication.translate("HexapodController", "Walk control", None)
-        )
+        self.label_8.setText(QCoreApplication.translate("HexapodController", "Walk control", None))
         self.velocity_dir_title.setText(
-            QCoreApplication.translate(
-                "HexapodController", "Linear velocity direction", None
-            )
+            QCoreApplication.translate("HexapodController", "Linear velocity direction", None)
         )
-        self.label.setText(
-            QCoreApplication.translate("HexapodController", "Angle", None)
-        )
+        self.label.setText(QCoreApplication.translate("HexapodController", "Angle", None))
         self.velocity_value_title.setText(
-            QCoreApplication.translate(
-                "HexapodController", "Linear velocity value", None
-            )
+            QCoreApplication.translate("HexapodController", "Linear velocity value", None)
         )
-        self.vval_stop_button.setText(
-            QCoreApplication.translate("HexapodController", "Stop", None)
-        )
-        self.angular_vel_title.setText(
-            QCoreApplication.translate("HexapodController", "Angular velocity", None)
-        )
-        self.angular_vel_stopbutton.setText(
-            QCoreApplication.translate("HexapodController", "Stop", None)
-        )
-        self.label_2.setText(
-            QCoreApplication.translate("HexapodController", "Battery level", None)
-        )
-        self.label_7.setText(
-            QCoreApplication.translate("HexapodController", "Gait", None)
-        )
+        self.vval_stop_button.setText(QCoreApplication.translate("HexapodController", "Stop", None))
+        self.angular_vel_title.setText(QCoreApplication.translate("HexapodController", "Angular velocity", None))
+        self.angular_vel_stopbutton.setText(QCoreApplication.translate("HexapodController", "Stop", None))
+        self.label_2.setText(QCoreApplication.translate("HexapodController", "Battery level", None))
+        self.label_7.setText(QCoreApplication.translate("HexapodController", "Gait", None))
         self.gait_selection.setCurrentText("")
-        self.velocity_title.setText(
-            QCoreApplication.translate("HexapodController", "Body control", None)
-        )
-        self.label_3.setText(
-            QCoreApplication.translate("HexapodController", "Roll control", None)
-        )
-        self.roll_reset_button.setText(
-            QCoreApplication.translate("HexapodController", "Reset", None)
-        )
-        self.label_4.setText(
-            QCoreApplication.translate("HexapodController", "Pitch control", None)
-        )
-        self.pitch_reset_button.setText(
-            QCoreApplication.translate("HexapodController", "Reset", None)
-        )
-        self.label_5.setText(
-            QCoreApplication.translate("HexapodController", "Base height", None)
-        )
-        self.base_height_default_button.setText(
-            QCoreApplication.translate("HexapodController", "Default", None)
-        )
+        self.velocity_title.setText(QCoreApplication.translate("HexapodController", "Body control", None))
+        self.label_3.setText(QCoreApplication.translate("HexapodController", "Roll control", None))
+        self.roll_reset_button.setText(QCoreApplication.translate("HexapodController", "Reset", None))
+        self.label_4.setText(QCoreApplication.translate("HexapodController", "Pitch control", None))
+        self.pitch_reset_button.setText(QCoreApplication.translate("HexapodController", "Reset", None))
+        self.label_5.setText(QCoreApplication.translate("HexapodController", "Base height", None))
+        self.base_height_default_button.setText(QCoreApplication.translate("HexapodController", "Default", None))
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.Walk),
             QCoreApplication.translate("HexapodController", "Walk", None),
         )
-        self.menuAbout.setTitle(
-            QCoreApplication.translate("HexapodController", "Help", None)
-        )
+        self.menuAbout.setTitle(QCoreApplication.translate("HexapodController", "Help", None))
 
     # retranslateUi

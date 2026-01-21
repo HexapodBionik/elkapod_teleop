@@ -107,7 +107,7 @@ class ElkapodJoyNode(Node):
 
         self._joy_subscriber = self.create_subscription(Joy, "/joy", self._joystick_callback, 10)
 
-        self._cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
+        self._cmd_vel_publisher = self.create_publisher(Twist, "/joy_vel", 10)
         self._cmd_gait_type_publisher = self.create_publisher(Int32, "/cmd_gait_type", 10)
         self._cmd_base_height_publisher = self.create_publisher(Float64, "/cmd_base_height", 10)
         self._cmd_pitch_publisher = self.create_publisher(Float64, "/pitch_setpoint", 10)
