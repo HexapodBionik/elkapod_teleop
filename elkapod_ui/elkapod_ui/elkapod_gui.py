@@ -16,13 +16,14 @@ def main(args=None):
 
     app = QApplication()
 
-    window = ApplicationMainWindow()
-    nav_window = ApplicationNavWindow()
     ros_node = ElkapodControllerGui()
+    window = ApplicationMainWindow()
+    nav_window = ApplicationNavWindow(ros_node)
+
     window.node = ros_node
-    nav_window.node = ros_node
     window.setup()
-    nav_window.setup()
+
+    # nav_window.setup()
 
     executor = MultiThreadedExecutor()
     executor.add_node(ros_node)
